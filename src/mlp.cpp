@@ -28,14 +28,14 @@ mlp& mlp::operator=(const mlp &p)
 {
 	if (this != &p)
 		network  = p.network;
-    return *this;
+	return *this;
 }
 
 mlp& mlp::operator=(mlp &&p)
 {
 	if (this != &p)
 		network  = std::move(p.network);
-    return *this;
+	return *this;
 }
 
 bool mlp::operator==(const mlp &p) const

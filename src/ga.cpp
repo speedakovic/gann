@@ -26,7 +26,7 @@ void selection_op_roulette::run(const std::vector<double> &scores, std::vector<s
 	}
 
 	std::random_device rd;
-    std::mt19937 mt(rd());
+	std::mt19937 mt(rd());
 	std::uniform_real_distribution<double> distr(0, s);
 
 	std::vector<std::vector<double>> population_old(population);
@@ -50,7 +50,7 @@ void selection_op_roulette::run(const std::vector<double> &scores, std::vector<s
 void crossover_op_single_arithmetic::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
-    std::mt19937 mt(rd());
+	std::mt19937 mt(rd());
 	std::uniform_int_distribution<size_t> distr_index(0, limits.size() - 1);
 	std::uniform_real_distribution<double> distr_alpha(0, 1);
 
@@ -65,15 +65,15 @@ void crossover_op_single_arithmetic::run(const std::vector<std::vector<double>> 
 		double ind1_par = ind1[index];
 		double ind2_par = ind2[index];
 
-		ind1[index] = ind1_par * alpha  + ind2_par * (1 - alpha);
-		ind2[index] = ind2_par * alpha  + ind1_par * (1 - alpha);
+		ind1[index] = ind1_par * alpha	+ ind2_par * (1 - alpha);
+		ind2[index] = ind2_par * alpha	+ ind1_par * (1 - alpha);
 	}
 }
 
 void crossover_op_multiple_arithmetic::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
-    std::mt19937 mt(rd());
+	std::mt19937 mt(rd());
 	std::uniform_int_distribution<size_t> distr_index(0, limits.size() - 1);
 	std::uniform_real_distribution<double> distr_alpha(0, 1);
 
@@ -94,8 +94,8 @@ void crossover_op_multiple_arithmetic::run(const std::vector<std::vector<double>
 			double ind1_par = ind1[index];
 			double ind2_par = ind2[index];
 
-			ind1[index] = ind1_par * alpha  + ind2_par * (1 - alpha);
-			ind2[index] = ind2_par * alpha  + ind1_par * (1 - alpha);
+			ind1[index] = ind1_par * alpha	+ ind2_par * (1 - alpha);
+			ind2[index] = ind2_par * alpha	+ ind1_par * (1 - alpha);
 		}
 	}
 }
@@ -107,7 +107,7 @@ void crossover_op_multiple_arithmetic::run(const std::vector<std::vector<double>
 void mutation_op_uniform::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
-    std::mt19937 mt(rd());
+	std::mt19937 mt(rd());
 	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
 	std::uniform_int_distribution<size_t> distr_param_index(0, limits.size() - 1);
 	std::vector<std::uniform_real_distribution<double>> distr_param;
@@ -127,7 +127,7 @@ void mutation_op_uniform::run(const std::vector<std::vector<double>> &limits, st
 void mutation_op_normal::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
-    std::mt19937 mt(rd());
+	std::mt19937 mt(rd());
 	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
 	std::uniform_int_distribution<size_t> distr_param_index(0, limits.size() - 1);
 	std::vector<std::normal_distribution<double>> distr_param;
@@ -181,30 +181,30 @@ void score_scaler_linear::run(const std::vector<double> &scores, std::vector<dou
 ////////////////////////////////////////////////////////////////////////////////
 
 ga::ga() :
-	limits    (),
+	limits	  (),
 	selection (),
 	crossover (),
 	mutation  (),
-	scaler    (),
+	scaler	  (),
 	popsize   (),
 	elisize   (),
-	genmax    (),
-	convn     (),
+	genmax	  (),
+	convn	  (),
 	convmax   (),
-	thnum     ()
+	thnum	  ()
 {
 }
 
 bool ga::configure(const std::vector<std::vector<double>> &limits,
-                   const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
-                   const size_t &popsize, const size_t &elisize, const size_t &genmax, const size_t &convn, const double &convmax, const size_t &thnum)
+				   const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
+				   const size_t &popsize, const size_t &elisize, const size_t &genmax, const size_t &convn, const double &convmax, const size_t &thnum)
 {
 	this->limits = limits;
 
 	this->selection = selection;
 	this->crossover = crossover;
-	this->mutation  = mutation;
-	this->scaler    = scaler;
+	this->mutation	= mutation;
+	this->scaler	= scaler;
 
 	this->popsize = popsize % 2 ? popsize + 1: popsize;
 	this->elisize = elisize;
@@ -281,7 +281,7 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 bool ga::initialize_population(std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
-    std::mt19937 mt(rd());
+	std::mt19937 mt(rd());
 	std::vector<std::uniform_real_distribution<double>> distr;
 
 	for (const auto &limit : limits)
@@ -359,7 +359,7 @@ bool ga::calculate_scores_mt(const evaluator &eval, const std::vector<std::vecto
 
 	for (size_t i = 0; i < thnum; ++i)
 		threads.push_back(std::thread(evaluator_runner, std::cref(eval),
-		                  std::ref(mutex), std::cref(population), std::ref(scores), std::ref(index), std::ref(err)));
+						  std::ref(mutex), std::cref(population), std::ref(scores), std::ref(index), std::ref(err)));
 
 	for(auto &thread : threads)
 		thread.join();
