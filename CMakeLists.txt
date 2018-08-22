@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(gann)
 
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread")
+find_package(Threads)
 
 set(GANN_SRC src/ga.cpp src/mlp.cpp src/util.cpp)
 set(GANN_HDR include/gann/ga.h include/gann/mlp.h include/gann/util.h)
@@ -25,5 +25,5 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 add_executable(paraboloid examples/paraboloid/main.cpp)
-target_link_libraries(paraboloid ${PROJECT_NAME})
+target_link_libraries(paraboloid ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
