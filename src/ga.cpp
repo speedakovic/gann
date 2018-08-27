@@ -225,10 +225,12 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
 	std::vector<double> scores_scaled(popsize);
 	std::vector<double> scores(popsize);
+	std::queue<double> best_scores;
 
 	std::vector<size_t> i_scores(popsize);
 	double mean_score;
 	double median_score;
+	double conv;
 
 	size_t gencnt = 0;
 
@@ -247,9 +249,21 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 	++gencnt;
 
 	calculate_stats(scores, i_scores, mean_score, median_score);
-	std::cout << "gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << std::endl;
+	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
 
-	while (gencnt < genmax) {
+	std::cout << "gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl;
+
+	while (true) {
+
+		if (genmax > 0 && gencnt >= genmax) {
+			std::cout << "maximum number of generations reached" << std::endl;
+			break;
+		}
+
+		if (std::isnormal(conv) && conv >= convmax) {
+			std::cout << "maximum convergence reached" << std::endl;
+			break;
+		}
 
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
@@ -269,7 +283,10 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 		++gencnt;
 
 		calculate_stats(scores, i_scores, mean_score, median_score);
-		std::cout << "gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << std::endl;
+		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+
+		std::cout.precision(20);
+		std::cout << "gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl;
 	}
 
 	params = population[i_scores[0]];
@@ -379,6 +396,20 @@ void ga::calculate_stats(const std::vector<double> &scores, std::vector<size_t> 
 
 	mean_score = std::accumulate(scores.begin(), scores.end(), 0.) / scores.size();
 	median_score = scores[i_scores[i_scores.size() / 2]];
+}
+
+void ga::calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const
+{
+	if (0 == convn) {
+		conv = std::nan("");
+	} else if (best_scores.size() < convn) {
+		conv = std::nan("");
+		best_scores.push(best_score);
+	} else {
+		conv = best_scores.front() / best_score;
+		best_scores.pop();
+		best_scores.push(best_score);
+	}
 }
 
 } // namespace gann

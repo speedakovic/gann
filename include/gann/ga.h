@@ -1,6 +1,7 @@
 #ifndef GA_H
 #define GA_H
 
+#include <queue>
 #include <vector>
 
 namespace gann
@@ -235,8 +236,11 @@ public:
 	/// @param scaler score scaler (the scaled scores are used by selection operator)
 	/// @param popsize population size (must be even number, if it is not, then +1 will be added)
 	/// @param elisize number of best individuals, that will be directly passed to next generation (elitism feature)
-	/// @param genmax maximum generations, running will be terminated when this value is reached
-	/// @param convn number of generations to look back when convergence is calculated
+	/// @param genmax maximum generations, running will be terminated when this value is reached.
+	///               Set to zero to disable termination based on number of generations.
+	/// @param convn number of generations to look back when convergence is calculated.
+	///              Set to zero to disable termination based on convergence.
+	///              To use termination criterium based on convergence, scores must be positive numbers.
 	/// @param convmax maximum convergence, running will be terminated when this value is reached
 	/// @param thnum number of running threads, if zero then the number will be determined automatically
 	/// @return @c true if configuring was successful, otherwise @c false
@@ -256,6 +260,7 @@ private:
 	bool calculate_scores(const evaluator &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
 	bool calculate_scores_mt(const evaluator &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
 	void calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const;
+	void calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const;
 };
 
 } // namespace gann
