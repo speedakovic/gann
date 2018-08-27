@@ -9,9 +9,11 @@
 static double X = 1.;
 static double Y = 2.;
 
-static size_t POPSIZE = 20;
-static size_t ELISIZE = 1;
-static size_t GENMAX  = 500;
+static size_t POPSIZE  = 50;
+static size_t ELISIZE  = 1;
+static size_t GENMAX   = 500;
+static size_t CONVN    = 50;
+static double CONVNMAX = .99;
 
 class paraboloid_ev : public gann::evaluator
 {
@@ -33,7 +35,7 @@ int main()
 	gann::ga                               ga;
 	gann::selection_op_roulette            selection;
 	gann::crossover_op_multiple_arithmetic crossover;
-	gann::mutation_op_normal               mutation;
+	gann::mutation_op_normal               mutation(0.2);
 	gann::score_scaler_linear              scaler;
 
 	paraboloid_ev ev;
@@ -41,7 +43,7 @@ int main()
 	std::vector<double> best_params;
 	double best_score;
 
-	if (!ga.configure({{-10, 10, 0}, {-10, 10, 0}}, &selection, &crossover, &mutation, &scaler, POPSIZE, ELISIZE, GENMAX, 0, 0, 0)) {
+	if (!ga.configure({{-10, 10, 0}, {-10, 10, 0}}, &selection, &crossover, &mutation, &scaler, POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, 0)) {
 		std::cerr << "configuring genetic algorithm failed" << std::endl;
 		return EXIT_FAILURE;
 	}
