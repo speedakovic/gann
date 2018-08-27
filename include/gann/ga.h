@@ -201,7 +201,6 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Genetic algorithm.
-/// @todo Terminating upon convn and convmax variables.
 class ga
 {
 private:
