@@ -33,10 +33,10 @@ void selection_op_roulette::run(const std::vector<double> &scores, std::vector<s
 
 	for (size_t i = 0; i < population.size(); ++i) {
 
-		double r = distr(mt);
+		double r = s - distr(mt);
 		size_t j = 0;
 
-		for (; r > 0 && j < scores.size(); ++j)
+		for (; r > 0. && j < scores.size(); ++j)
 			r -= scores[j];
 
 		population[i] = population_old[j - 1];
