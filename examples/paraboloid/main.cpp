@@ -15,7 +15,8 @@ static size_t GENMAX   = 500;
 static size_t CONVN    = 50;
 static double CONVNMAX = .99;
 
-class paraboloid_ev : public gann::evaluator
+/*
+class paraboloid_ev : public gann::evaluator_single
 {
 public:
 	virtual bool run(const std::vector<double> &params, double &score) const
@@ -26,13 +27,28 @@ public:
 		score = 1 / z;
 		return true;
 	};
+};*/
+
+class paraboloid_ev : public gann::evaluator_multi
+{
+public:
+	virtual bool run(const std::vector<std::vector<double>> &params, std::vector<double> &scores) const
+	{
+		for (size_t i = 0; i < params.size(); ++i) {
+			double x = params[i][0];
+			double y = params[i][1];
+			double z = pow(x - X, 2) + pow(y - Y, 2);
+			scores[i] = 1 / z;
+		}
+		return true;
+	};
 };
 
 int main()
 {
 	using gann::operator<<;
 
-	gann::ga                               ga;
+	gann::ga_simple                        ga;
 	gann::selection_op_roulette            selection;
 	gann::crossover_op_multiple_arithmetic crossover;
 	gann::mutation_op_normal               mutation(0.2);

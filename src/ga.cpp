@@ -153,7 +153,7 @@ void mutation_op_normal::run(const std::vector<std::vector<double>> &limits, std
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// score scaler
+// score scalers
 ////////////////////////////////////////////////////////////////////////////////
 
 void score_scaler_none::run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
@@ -178,10 +178,10 @@ void score_scaler_linear::run(const std::vector<double> &scores, std::vector<dou
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// genetic algorithm
+// genetic algorithms
 ////////////////////////////////////////////////////////////////////////////////
 
-ga::ga() :
+ga_simple::ga_simple() :
 	limits	  (),
 	selection (),
 	crossover (),
@@ -196,7 +196,7 @@ ga::ga() :
 {
 }
 
-bool ga::configure(const std::vector<std::vector<double>> &limits,
+bool ga_simple::configure(const std::vector<std::vector<double>> &limits,
 				   const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
 				   const size_t &popsize, const size_t &elisize, const size_t &genmax, const size_t &convn, const double &convmax, const size_t &thnum)
 {
@@ -220,7 +220,7 @@ bool ga::configure(const std::vector<std::vector<double>> &limits,
 }
 
 // conv = bestscore[current - convn] / bestscore[current]
-bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) const
+bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -235,6 +235,7 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 
 	size_t gencnt = 0;
 
+	GANN_DBG("Running simple ga with single-evaluator..." << std::endl);
 	GANN_DBG("running threads: " << thnum << std::endl);
 
 	if (!initialize_population(population)) {
@@ -295,7 +296,87 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 	return true;
 }
 
-bool ga::initialize_population(std::vector<std::vector<double>> &population) const
+// conv = bestscore[current - convn] / bestscore[current]
+bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, double &score) const
+{
+	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
+	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
+	std::vector<double> scores_scaled(popsize);
+	std::vector<double> scores(popsize);
+	std::queue<double> best_scores;
+
+	std::vector<size_t> i_scores(popsize);
+	double mean_score;
+	double median_score;
+	double conv;
+
+	size_t gencnt = 0;
+
+	GANN_DBG("Running simple ga with multi-evaluator..." << std::endl);
+
+	if (!initialize_population(population)) {
+		GANN_ERR("initializing population failed" << std::endl);
+		return false;
+	}
+
+	if (!eval.run(population, scores)) {
+		GANN_ERR("evaluating scores failed" << std::endl);
+		return false;
+	}
+
+	scaler->run(scores, scores_scaled);
+
+	++gencnt;
+
+	calculate_stats(scores, i_scores, mean_score, median_score);
+	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+
+	GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+
+	while (true) {
+
+		if (genmax > 0 && gencnt >= genmax) {
+			GANN_DBG("maximum number of generations reached" << std::endl);
+			break;
+		}
+
+		if (std::isnormal(conv) && conv >= convmax) {
+			GANN_DBG("maximum convergence reached" << std::endl);
+			break;
+		}
+
+		for (size_t i = 0; i < elisize; ++i)
+			elite[i] = population[i_scores[i]];
+
+		selection->run(scores_scaled, population);
+		crossover->run(limits, population);
+		mutation ->run(limits, population);
+
+		for (size_t i = 0; i < elisize; ++i)
+			population[i] = elite[i];
+
+		if (!eval.run(population, scores)) {
+			GANN_ERR("evaluating scores failed" << std::endl);
+			return false;
+		}
+
+		scaler->run(scores, scores_scaled);
+
+		++gencnt;
+
+		calculate_stats(scores, i_scores, mean_score, median_score);
+		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+
+		GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	}
+
+	params = population[i_scores[0]];
+	score  = scores[i_scores[0]];
+
+	return true;
+}
+
+bool ga_simple::initialize_population(std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -311,7 +392,7 @@ bool ga::initialize_population(std::vector<std::vector<double>> &population) con
 	return true;
 }
 
-bool ga::calculate_scores(const evaluator &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
+bool ga_simple::calculate_scores(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	for (size_t i = 0; i < population.size(); ++i) {
 
@@ -330,7 +411,7 @@ bool ga::calculate_scores(const evaluator &eval, const std::vector<std::vector<d
 	return true;
 }
 
-static void evaluator_runner(const evaluator &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err)
+static void evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err)
 {
 	size_t i;
 	double score;
@@ -367,7 +448,7 @@ static void evaluator_runner(const evaluator &eval, std::mutex &mutex, const std
 	}
 }
 
-bool ga::calculate_scores_mt(const evaluator &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
+bool ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	int err = 0;
 	size_t index = 0;
@@ -389,7 +470,7 @@ bool ga::calculate_scores_mt(const evaluator &eval, const std::vector<std::vecto
 	return true;
 }
 
-void ga::calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const
+void ga_simple::calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const
 {
 	std::iota(i_scores.begin(), i_scores.end(), static_cast<size_t>(0));
 	std::sort(i_scores.begin(), i_scores.end(), [&scores](const size_t &x, const size_t &y){return scores[x] > scores[y];});
@@ -398,7 +479,7 @@ void ga::calculate_stats(const std::vector<double> &scores, std::vector<size_t> 
 	median_score = scores[i_scores[i_scores.size() / 2]];
 }
 
-void ga::calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const
+void ga_simple::calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const
 {
 	if (0 == convn) {
 		conv = std::nan("");

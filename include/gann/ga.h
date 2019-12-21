@@ -25,7 +25,7 @@ public:
 };
 
 /// @brief Roulette selection operator.
-///        This operator suppose the scores to be positive.
+///        This operator supposes the scores to be positive.
 class selection_op_roulette : public selection_op
 {
 public:
@@ -137,7 +137,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// score scaler
+// score scalers
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for score scaler.
@@ -181,11 +181,19 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// evaluator
+// evaluators
 ////////////////////////////////////////////////////////////////////////////////
 
-/// @brief Evaluator (fitness) interface.
+/// @brief Base class for evaluator.
 class evaluator
+{
+public:
+	/// @brief Destructor.
+	virtual ~evaluator() = default;
+};
+
+/// @brief Single individual evaluator.
+class evaluator_single : public evaluator
 {
 public:
 	/// @brief Runs evaluator.
@@ -196,12 +204,32 @@ public:
 	virtual bool run(const std::vector<double> &params, double &score) const = 0;
 };
 
+/// @brief Multiple individuals evaluator.
+class evaluator_multi : public evaluator
+{
+public:
+	/// @brief Runs evaluator.
+	///        It computes score (fitness) for given individual genome.
+	/// @param params vectorbof the whole population genomes
+	/// @param score scores
+	/// @return @c true if scores were computed successfully, otherwise @c false
+	virtual bool run(const std::vector<std::vector<double>> &params, std::vector<double> &scores) const = 0;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
-// genetic algorithm
+// genetic algorithms
 ////////////////////////////////////////////////////////////////////////////////
 
-/// @brief Genetic algorithm.
+/// @brief Base class genetic algorithm.
 class ga
+{
+public:
+	/// @brief Destructor.
+	virtual ~ga() = default;
+};
+
+/// @brief Simple genetic algorithm.
+class ga_simple : public ga
 {
 private:
 	std::vector<std::vector<double>> limits;
@@ -222,7 +250,7 @@ private:
 
 public:
 	/// @brief Constructor.
-	ga();
+	ga_simple();
 
 	/// @brief Configure optimizer
 	/// @param limits limiting values for each optimized parameter
@@ -252,12 +280,19 @@ public:
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	virtual bool run(const evaluator &eval, std::vector<double> &params, double &score) const;
+	virtual bool run(const evaluator_single &eval, std::vector<double> &params, double &score) const;
+
+	/// @brief Runs genetic algorithm.
+	/// @param eval evaluator
+	/// @param params best genome
+	/// @param score best score
+	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
+	virtual bool run(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
 
 private:
 	bool initialize_population(std::vector<std::vector<double>> &population) const;
-	bool calculate_scores(const evaluator &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
-	bool calculate_scores_mt(const evaluator &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	bool calculate_scores(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	bool calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
 	void calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const;
 	void calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const;
 };
