@@ -50,7 +50,7 @@ int main()
 	using gann::operator<<;
 
 	gann::ga_simple                        ga;
-	gann::selection_op_roulette            selection;
+	gann::selection_op_roulette            selection(10);
 	gann::crossover_op_multiple_arithmetic crossover;
 	gann::mutation_op_normal               mutation(0.2);
 	gann::score_scaler_linear              scaler;

@@ -12,6 +12,10 @@ namespace gann
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for selection operator.
+///        The result of selection (population vector), which immediately
+///        goes to crossover, should maintain the same size and be produced
+///        in this form: {parent1, parent2, parent1, parent2, parent1, parent2, ...}
+///        It is the selection operator's responsibility, that each parent1 shouldn't equal parent2.
 class selection_op
 {
 public:
@@ -25,13 +29,17 @@ public:
 };
 
 /// @brief Roulette selection operator.
-///        This operator just runs the roulette wheel the same times as is the number of
-///        individuals in population. So the size of population remains unchanged, but
-///        some individuals may be duplicated.
 ///        The given scores must be positive, so appropriate scaler should be used.
 class selection_op_roulette : public selection_op
 {
+private:
+	const size_t extra_runs;
 public:
+	/// @brief Constructor.
+	/// @param extra_runs number of extra roulette wheel runs for the each
+	///        second parent to be different from the first one.
+	explicit selection_op_roulette(size_t extra_runs = 1) : extra_runs(extra_runs) {};
+
 	/// @copydoc selection_op::run
 	virtual void run(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
@@ -41,6 +49,10 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for crossover operator.
+///        The crossover operator should await the selected population
+///        in this form: {parent1, parent2, parent1, parent2, parent1, parent2, ...}
+///        The result of crossover (population vector), which immediately
+///        goes to mutation, should maintain the same size.
 class crossover_op
 {
 public:
@@ -90,6 +102,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for mutation operator.
+///        The result of mutation (population vector), which immediately
+///        goes to conditional elitism process and then to evaluation, should maintain the same size.
 class mutation_op
 {
 public:

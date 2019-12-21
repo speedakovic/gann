@@ -32,15 +32,34 @@ void selection_op_roulette::run(const std::vector<double> &scores, std::vector<s
 
 	std::vector<std::vector<double>> population_old(population);
 
-	for (size_t i = 0; i < population.size(); ++i) {
+	for (size_t i = 0; i < population.size() - 1; i += 2) {
 
-		double r = s - distr(mt);
-		size_t j = 0;
+		size_t extra_run = extra_runs;
+		size_t i0, i1;
 
-		for (; r > 0. && j < scores.size(); ++j)
-			r -= scores[j];
+		{
+			double r = s - distr(mt);
+			size_t j = 0;
 
-		population[i] = population_old[j - 1];
+			for (; r > 0. && j < scores.size(); ++j)
+				r -= scores[j];
+
+			i0 = j - 1;
+		}
+
+		do {
+			double r = s - distr(mt);
+			size_t j = 0;
+
+			for (; r > 0. && j < scores.size(); ++j)
+				r -= scores[j];
+
+			i1 = j - 1;
+
+		} while (population_old[i0] == population_old[i1] && extra_run--);
+
+		population[i    ] = population_old[i0];
+		population[i + 1] = population_old[i1];
 	}
 }
 
