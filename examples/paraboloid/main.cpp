@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <chrono>
 #include <vector>
 #include <iostream>
 
@@ -64,11 +65,14 @@ int main()
 		return EXIT_FAILURE;
 	}
 
+	auto begin = std::chrono::steady_clock::now();
 	if (!ga.run(ev, best_params, best_score)) {
 		std::cerr << "running genetic algorithm failed" << std::endl;
 		return EXIT_FAILURE;
 	}
+	auto end = std::chrono::steady_clock::now();
 
+	std::cout << "duration [us]   : " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
 	std::cout << "expected params : " << std::vector<double>{X,Y} << std::endl;
 	std::cout << "best params     : " << best_params              << std::endl;
 	std::cout << "best score      : " << best_score               << std::endl;
