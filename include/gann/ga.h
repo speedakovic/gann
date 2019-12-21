@@ -30,7 +30,7 @@ class selection_op_roulette : public selection_op
 {
 public:
 	/// @copydoc selection_op::run
-	virtual void run(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const;
+	virtual void run(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ class crossover_op_single_arithmetic : public crossover_op
 {
 public:
 	/// @copydoc crossover_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const;
+	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Multiple crossover operator.
@@ -77,7 +77,7 @@ class crossover_op_multiple_arithmetic : public crossover_op
 {
 public:
 	/// @copydoc crossover_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const;
+	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ public:
 	explicit mutation_op_uniform(double p = 0.01) : p(p) {};
 
 	/// @copydoc mutation_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const;
+	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Normal mutation operator.
@@ -133,7 +133,7 @@ public:
 	explicit mutation_op_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {};
 
 	/// @copydoc mutation_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const;
+	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,7 @@ class score_scaler_none : public score_scaler
 {
 public:
 	/// @copydoc score_scaler::run
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
 /// @brief Offset scaler.
@@ -168,7 +168,7 @@ class score_scaler_offset : public score_scaler
 {
 public:
 	/// @copydoc score_scaler::run
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
 /// @brief Linear scaler.
@@ -177,7 +177,7 @@ class score_scaler_linear : public score_scaler
 {
 public:
 	/// @copydoc score_scaler::run
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
