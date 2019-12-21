@@ -25,7 +25,10 @@ public:
 };
 
 /// @brief Roulette selection operator.
-///        This operator supposes the scores to be positive.
+///        This operator just runs the roulette wheel the same times as is the number of
+///        individuals in population. So the size of population remains unchanged, but
+///        some individuals may be duplicated.
+///        The given scores must be positive, so appropriate scaler should be used.
 class selection_op_roulette : public selection_op
 {
 public:
@@ -51,6 +54,7 @@ public:
 };
 
 /// @brief Single crossover operator.
+///        Each two neighbouring individuals are crossovered into new two ones.
 ///        Single parameter index 'i' is randomly selected.
 ///        Random value 'alpha' is selected from uniform distribution U(0,1).
 ///        Then crossover is performed in this way:
@@ -66,6 +70,7 @@ public:
 };
 
 /// @brief Multiple crossover operator.
+///        Each two neighbouring individuals are crossovered into new two ones.
 ///        Multiple parameter indexes 'i' are randomly selected.
 ///        For each 'i' random value 'alpha' is selected from uniform distribution U(0,1).
 ///        Then crossover is performed in this way:
@@ -199,7 +204,7 @@ public:
 	/// @brief Runs evaluator.
 	///        It computes score (fitness) for given individual genome.
 	/// @param params individual genome
-	/// @param score score
+	/// @param score evaluated score of given genome
 	/// @return @c true if score was computed successfully, otherwise @c false
 	virtual bool run(const std::vector<double> &params, double &score) const = 0;
 };
@@ -210,8 +215,9 @@ class evaluator_multi : public evaluator
 public:
 	/// @brief Runs evaluator.
 	///        It computes score (fitness) for given individual genome.
-	/// @param params vectorbof the whole population genomes
-	/// @param score scores
+	/// @param params vector of the whole population genomes
+	/// @param scores evaluated scores of given genomes. Vector passed to evaluator has
+	///               the same size as vector of population genomes, so no insertion is needed.
 	/// @return @c true if scores were computed successfully, otherwise @c false
 	virtual bool run(const std::vector<std::vector<double>> &params, std::vector<double> &scores) const = 0;
 };
@@ -269,7 +275,9 @@ public:
 	///              Set to zero to disable termination based on convergence.
 	///              To use termination criterium based on convergence, scores must be positive numbers.
 	/// @param convmax maximum convergence, running will be terminated when this value is reached
-	/// @param thnum number of running threads, if zero then the number will be determined automatically
+	/// @param thnum number of running threads, if zero then the number will be determined automatically.
+	///              This parameter is meaningful only for running with single individual evaluator.
+	///              Multiple individuals evaluator runs only in one (caller's) thread.
 	/// @return @c true if configuring was successful, otherwise @c false
 	bool configure(const std::vector<std::vector<double>> &limits,
 	               const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,

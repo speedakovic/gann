@@ -235,7 +235,7 @@ bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, d
 
 	size_t gencnt = 0;
 
-	GANN_DBG("Running simple ga with single-evaluator..." << std::endl);
+	GANN_DBG("running simple ga with single-evaluator..." << std::endl);
 	GANN_DBG("running threads: " << thnum << std::endl);
 
 	if (!initialize_population(population)) {
@@ -312,7 +312,7 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 
 	size_t gencnt = 0;
 
-	GANN_DBG("Running simple ga with multi-evaluator..." << std::endl);
+	GANN_DBG("running simple ga with multi-evaluator..." << std::endl);
 
 	if (!initialize_population(population)) {
 		GANN_ERR("initializing population failed" << std::endl);
