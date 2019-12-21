@@ -1,4 +1,5 @@
 #include <gann/mlp.h>
+#include <gann/log.h>
 #include <gann/util.h>
 
 #include <cmath>
@@ -51,13 +52,13 @@ bool mlp::operator!=(const mlp &p) const
 bool mlp::set_architecture(const std::vector<size_t> &arch)
 {
 	if (arch.size() < 2) {
-		std::cerr << "too few items in mlp architecture descriptor" << std::endl;
+		GANN_ERR("too few items in mlp architecture descriptor" << std::endl);
 		return false;
 	}
 
 	for (const auto &i : arch)
 		if (i == 0) {
-			std::cerr << "zero item in mlp architecture descriptor" << std::endl;
+			GANN_ERR("zero item in mlp architecture descriptor" << std::endl);
 			return false;
 		}
 
@@ -99,7 +100,7 @@ bool mlp::set_activation_functions(const std::vector<activation_function> &af)
 		i += layer.size();
 
 	if (af.size() != i) {
-		std::cerr << "number of activation functions doesn't match the number of neurons" << std::endl;
+		GANN_ERR("number of activation functions doesn't match the number of neurons" << std::endl);
 		return false;
 	}
 
@@ -114,7 +115,7 @@ bool mlp::set_activation_functions(const std::vector<activation_function> &af)
 bool mlp::set_activation_functions_by_layers(const std::vector<activation_function> &af)
 {
 	if (af.size() != network.size()) {
-		std::cerr << "number of activation functions doesn't match the number of layers" << std::endl;
+		GANN_ERR("number of activation functions doesn't match the number of layers" << std::endl);
 		return false;
 	}
 
@@ -133,7 +134,7 @@ bool mlp::set_weights(const std::vector<double> &weights)
 			i += neuron.first.size();
 
 	if (weights.size() != i) {
-		std::cerr << "number of weights doesn't match" << std::endl;
+		GANN_ERR("number of weights doesn't match" << std::endl);
 		return false;
 	}
 
@@ -161,7 +162,7 @@ std::vector<double> mlp::get_weights() const
 std::vector<double> mlp::propagate(const std::vector<double> &in)
 {
 	if (network.empty()) {
-		std::cerr << "empty network" << std::endl;
+		GANN_ERR("empty network" << std::endl);
 		return {};
 	}
 
@@ -173,7 +174,7 @@ std::vector<double> mlp::propagate(const std::vector<double> &in)
 		for (const auto &neuron : layer) {
 
 			if (inputs.size() != neuron.first.size() - 1) {
-				std::cerr << "number of inputs doesn't match the number of weights" << std::endl;
+				GANN_ERR("number of inputs doesn't match the number of weights" << std::endl);
 				return {};
 			}
 

@@ -1,4 +1,5 @@
 #include <gann/ga.h>
+#include <gann/log.h>
 
 #include <cmath>
 #include <mutex>
@@ -21,7 +22,7 @@ void selection_op_roulette::run(const std::vector<double> &scores, std::vector<s
 	double s = std::accumulate(scores.begin(), scores.end(), 0.);
 
 	if (!std::isnormal(s) || !std::isgreater(s, 0.)) {
-		std::cerr << "unexpected scores, selection by copy" << std::endl;
+		GANN_ERR("unexpected scores, selection by copy" << std::endl);
 		return;
 	}
 
@@ -234,15 +235,15 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 
 	size_t gencnt = 0;
 
-	std::cout << "running threads: " << thnum << std::endl;
+	GANN_DBG("running threads: " << thnum << std::endl);
 
 	if (!initialize_population(population)) {
-		std::cerr << "initializing population failed" << std::endl;
+		GANN_ERR("initializing population failed" << std::endl);
 		return false;
 	}
 
 	if (!calculate_scores_mt(eval, population, scores, scores_scaled)) {
-		std::cerr << "calculating scores failed" << std::endl;
+		GANN_ERR("calculating scores failed" << std::endl);
 		return false;
 	}
 
@@ -251,17 +252,17 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 	calculate_stats(scores, i_scores, mean_score, median_score);
 	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
 
-	std::cout << "gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl;
+	GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 
 	while (true) {
 
 		if (genmax > 0 && gencnt >= genmax) {
-			std::cout << "maximum number of generations reached" << std::endl;
+			GANN_DBG("maximum number of generations reached" << std::endl);
 			break;
 		}
 
 		if (std::isnormal(conv) && conv >= convmax) {
-			std::cout << "maximum convergence reached" << std::endl;
+			GANN_DBG("maximum convergence reached" << std::endl);
 			break;
 		}
 
@@ -276,7 +277,7 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 			population[i] = elite[i];
 
 		if (!calculate_scores_mt(eval, population, scores, scores_scaled)) {
-			std::cerr << "calculating scores failed" << std::endl;
+			GANN_ERR("calculating scores failed" << std::endl);
 			return false;
 		}
 
@@ -284,9 +285,8 @@ bool ga::run(const evaluator &eval, std::vector<double> &params, double &score) 
 
 		calculate_stats(scores, i_scores, mean_score, median_score);
 		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
-
-		std::cout.precision(20);
-		std::cout << "gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl;
+		
+		GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 	}
 
 	params = population[i_scores[0]];
@@ -318,7 +318,7 @@ bool ga::calculate_scores(const evaluator &eval, const std::vector<std::vector<d
 		double score;
 
 		if (!eval.run(population[i], score)) {
-			std::cerr << "running evaluator failed" << std::endl;
+			GANN_ERR("running evaluator failed" << std::endl);
 			return false;
 		}
 
@@ -350,7 +350,7 @@ static void evaluator_runner(const evaluator &eval, std::mutex &mutex, const std
 		mutex.unlock();
 
 		if (!eval.run(population[i], score)) {
-			std::cerr << "evaluator runner " << std::this_thread::get_id() << " failed because of running evaluator failed" << std::endl;
+			GANN_ERR("evaluator runner " << std::this_thread::get_id() << " failed because of running evaluator failed" << std::endl);
 			iserr = true;
 			break;
 		}
