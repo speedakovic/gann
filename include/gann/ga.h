@@ -16,7 +16,7 @@ class selection_op
 {
 public:
 	/// @brief Destructor.
-	virtual ~selection_op() {}
+	virtual ~selection_op() = default;
 
 	/// @brief Runs operator.
 	/// @param scores population scores
@@ -42,7 +42,7 @@ class crossover_op
 {
 public:
 	/// @brief Destructor.
-	virtual ~crossover_op() {}
+	virtual ~crossover_op() = default;
 
 	/// @brief Runs operator.
 	/// @param limits genome limits
@@ -89,7 +89,7 @@ class mutation_op
 {
 public:
 	/// @brief Destructor.
-	virtual ~mutation_op() {}
+	virtual ~mutation_op() = default;
 
 	/// @brief Runs operator.
 	/// @param limits genome limits
@@ -145,7 +145,7 @@ class score_scaler
 {
 public:
 	/// @brief Destructor.
-	virtual ~score_scaler() {}
+	virtual ~score_scaler() = default;
 
 	/// @brief Runs scaler.
 	/// @param scores population scores
