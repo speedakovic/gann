@@ -41,7 +41,6 @@ int main()
 {
 	using gann::operator<<;
 
-	gann::ga_simple                        ga;
 	gann::selection_op_roulette            selection(10);
 	gann::crossover_op_multiple_arithmetic crossover;
 	gann::mutation_op_normal               mutation(0.2);
@@ -50,11 +49,8 @@ int main()
 	std::vector<double> best_params;
 	double best_score;
 
-	if (!ga.configure({{-10, 10, 0}, {-10, 10, 0}}, &selection, &crossover, &mutation, &scaler,
-	                  POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0)) {
-		std::cerr << "configuring genetic algorithm failed" << std::endl;
-		return EXIT_FAILURE;
-	}
+	gann::ga_simple ga({{-10, 10, 0}, {-10, 10, 0}}, selection, crossover, mutation, scaler,
+	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0);
 
 	auto begin = std::chrono::steady_clock::now();
 	if (!ga.run(evaluator_multi, best_params, best_score)) {

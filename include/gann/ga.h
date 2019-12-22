@@ -252,9 +252,6 @@ private:
 
 public:
 	/// @brief Constructor.
-	ga_simple();
-
-	/// @brief Configure optimizer
 	/// @param limits limiting values for each optimized parameter
 	///               [i][0] - minimum
 	///               [i][1] - maximum
@@ -277,25 +274,25 @@ public:
 	///              This parameter is meaningful only for running with single individual evaluator.
 	///              Multiple individuals evaluator runs only in one (caller's) thread.
 	/// @return @c true if configuring was successful, otherwise @c false
-	bool configure(const std::vector<std::vector<double>> &limits,
-	               const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
-	               const size_t &popsize, const size_t &elisize,
-	               const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
-	               const size_t &thnum);
+	ga_simple(const std::vector<std::vector<double>> &limits,
+	          const selection_op &selection, const crossover_op &crossover, const mutation_op &mutation, const score_scaler &scaler,
+	          const size_t &popsize, const size_t &elisize,
+	          const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
+	          const size_t &thnum);
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. It is executed concurrently in multiple separated threads.
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	virtual bool run(const evaluator_single &eval, std::vector<double> &params, double &score) const;
+	bool run(const evaluator_single &eval, std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. It is executed in caller's thread;
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	virtual bool run(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
+	bool run(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
 
 private:
 	bool initialize_population(std::vector<std::vector<double>> &population) const;

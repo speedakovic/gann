@@ -199,47 +199,24 @@ void score_scaler_linear::run(const std::vector<double> &scores, std::vector<dou
 // genetic algorithms
 ////////////////////////////////////////////////////////////////////////////////
 
-ga_simple::ga_simple() :
-	limits	  (),
-	selection (),
-	crossover (),
-	mutation  (),
-	scaler	  (),
-	popsize   (),
-	elisize   (),
-	genmax	  (),
-	convn	  (),
-	convmax   (),
-	thnum	  ()
-{
-}
-
-bool ga_simple::configure(
-	const std::vector<std::vector<double>> &limits,
-	const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
-	const size_t &popsize, const size_t &elisize,
-	const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
-	const size_t &thnum)
-{
-	this->limits = limits;
-
-	this->selection = selection;
-	this->crossover = crossover;
-	this->mutation	= mutation;
-	this->scaler	= scaler;
-
-	this->popsize = popsize % 2 ? popsize + 1: popsize;
-	this->elisize = elisize;
-
-	this->genmax  = genmax;
-	this->convn   = convn;
-	this->convmax = convmax;
-	this->scoremax = scoremax;
-
-	this->thnum = thnum > 0 ? thnum : std::thread::hardware_concurrency();
-
-	return true;
-}
+ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
+                     const selection_op &selection, const crossover_op &crossover, const mutation_op &mutation, const score_scaler &scaler,
+                     const size_t &popsize, const size_t &elisize,
+                     const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
+                     const size_t &thnum) :
+	limits(limits),
+	selection(&selection),
+	crossover(&crossover),
+	mutation(&mutation),
+	scaler(&scaler),
+	popsize(popsize % 2 ? popsize + 1: popsize),
+	elisize(elisize),
+	genmax(genmax),
+	convn(convn),
+	convmax(convmax),
+	scoremax(scoremax),
+	thnum(thnum > 0 ? thnum : std::thread::hardware_concurrency())
+{}
 
 // conv = bestscore[current - convn] / bestscore[current]
 bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, double &score) const
