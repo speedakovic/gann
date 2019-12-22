@@ -15,6 +15,7 @@ static size_t ELISIZE  = 1;
 static size_t GENMAX   = 500;
 static size_t CONVN    = 50;
 static double CONVNMAX = .99;
+static double SCOREMAX = std::nan("");
 
 /*
 class paraboloid_ev : public gann::evaluator_single
@@ -60,7 +61,8 @@ int main()
 	std::vector<double> best_params;
 	double best_score;
 
-	if (!ga.configure({{-10, 10, 0}, {-10, 10, 0}}, &selection, &crossover, &mutation, &scaler, POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, 0)) {
+	if (!ga.configure({{-10, 10, 0}, {-10, 10, 0}}, &selection, &crossover, &mutation, &scaler,
+	                  POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0)) {
 		std::cerr << "configuring genetic algorithm failed" << std::endl;
 		return EXIT_FAILURE;
 	}

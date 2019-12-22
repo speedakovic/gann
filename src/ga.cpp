@@ -215,9 +215,12 @@ ga_simple::ga_simple() :
 {
 }
 
-bool ga_simple::configure(const std::vector<std::vector<double>> &limits,
-				   const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
-				   const size_t &popsize, const size_t &elisize, const size_t &genmax, const size_t &convn, const double &convmax, const size_t &thnum)
+bool ga_simple::configure(
+	const std::vector<std::vector<double>> &limits,
+	const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
+	const size_t &popsize, const size_t &elisize,
+	const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
+	const size_t &thnum)
 {
 	this->limits = limits;
 
@@ -232,6 +235,7 @@ bool ga_simple::configure(const std::vector<std::vector<double>> &limits,
 	this->genmax  = genmax;
 	this->convn   = convn;
 	this->convmax = convmax;
+	this->scoremax = scoremax;
 
 	this->thnum = thnum > 0 ? thnum : std::thread::hardware_concurrency();
 
@@ -286,15 +290,34 @@ bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, d
 			break;
 		}
 
+		if (!std::isnan(scoremax) && scores[i_scores[0]] >= scoremax) {
+			GANN_DBG("maximum score reached" << std::endl);
+			break;
+		}
+
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
 		selection->run(scores_scaled, population);
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
+
 		crossover->run(limits, population);
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after crossover: " << dups << std::endl);
+
 		mutation ->run(limits, population);
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after mutation: " << dups << std::endl);
 
 		for (size_t i = 0; i < elisize; ++i)
 			population[i] = elite[i];
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
 		if (!calculate_scores_mt(eval, population, scores, scores_scaled)) {
 			GANN_ERR("calculating scores failed" << std::endl);
@@ -364,15 +387,34 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 			break;
 		}
 
+		if (!std::isnan(scoremax) && scores[i_scores[0]] >= scoremax) {
+			GANN_DBG("maximum score reached" << std::endl);
+			break;
+		}
+
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
 		selection->run(scores_scaled, population);
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
+
 		crossover->run(limits, population);
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after crossover: " << dups << std::endl);
+
 		mutation ->run(limits, population);
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after mutation: " << dups << std::endl);
 
 		for (size_t i = 0; i < elisize; ++i)
 			population[i] = elite[i];
+
+		//if (size_t dups = find_2by2_duplicates(population))
+		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
 		if (!eval.run(population, scores)) {
 			GANN_ERR("evaluating scores failed" << std::endl);
@@ -510,6 +552,15 @@ void ga_simple::calculate_convergence(double &conv, std::queue<double> &best_sco
 		best_scores.pop();
 		best_scores.push(best_score);
 	}
+}
+
+size_t ga_simple::find_2by2_duplicates(const std::vector<std::vector<double>> &population) const
+{
+	size_t dups = 0;
+	for (size_t i = 0; i < population.size() - 1; i += 2)
+		if (population[i] == population[i + 1])
+			++dups;
+	return dups;
 }
 
 } // namespace gann

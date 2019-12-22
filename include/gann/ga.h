@@ -265,6 +265,7 @@ private:
 	size_t genmax;
 	size_t convn;
 	double convmax;
+	double scoremax;
 
 	size_t thnum;
 
@@ -289,13 +290,17 @@ public:
 	///              Set to zero to disable termination based on convergence.
 	///              To use termination criterium based on convergence, scores must be positive numbers.
 	/// @param convmax maximum convergence, running will be terminated when this value is reached
+	/// @param scoremax maximum score, running will be terminated when this value is reached
+	///                 Set to nan to disable termination based on score.
 	/// @param thnum number of running threads, if zero then the number will be determined automatically.
 	///              This parameter is meaningful only for running with single individual evaluator.
 	///              Multiple individuals evaluator runs only in one (caller's) thread.
 	/// @return @c true if configuring was successful, otherwise @c false
 	bool configure(const std::vector<std::vector<double>> &limits,
 	               const selection_op *selection, const crossover_op *crossover, const mutation_op *mutation, const score_scaler *scaler,
-	               const size_t &popsize, const size_t &elisize, const size_t &genmax, const size_t &convn, const double &convmax, const size_t &thnum);
+	               const size_t &popsize, const size_t &elisize,
+	               const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
+	               const size_t &thnum);
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator
@@ -317,6 +322,7 @@ private:
 	bool calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
 	void calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const;
 	void calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const;
+	size_t find_2by2_duplicates(const std::vector<std::vector<double>> &population) const;
 };
 
 } // namespace gann
