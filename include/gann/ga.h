@@ -1,8 +1,10 @@
 #ifndef GA_H
 #define GA_H
 
+#include <mutex>
 #include <queue>
 #include <vector>
+#include <functional>
 
 namespace gann
 {
@@ -200,43 +202,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// evaluators
-////////////////////////////////////////////////////////////////////////////////
-
-/// @brief Base class for evaluator.
-class evaluator
-{
-public:
-	/// @brief Destructor.
-	virtual ~evaluator() = default;
-};
-
-/// @brief Single individual evaluator.
-class evaluator_single : public evaluator
-{
-public:
-	/// @brief Runs evaluator.
-	///        It computes score (fitness) for given individual genome.
-	/// @param params individual genome
-	/// @param score evaluated score of given genome
-	/// @return @c true if score was computed successfully, otherwise @c false
-	virtual bool run(const std::vector<double> &params, double &score) const = 0;
-};
-
-/// @brief Multiple individuals evaluator.
-class evaluator_multi : public evaluator
-{
-public:
-	/// @brief Runs evaluator.
-	///        It computes score (fitness) for given individual genome.
-	/// @param params vector of the whole population genomes
-	/// @param scores evaluated scores of given genomes. Vector passed to evaluator has
-	///               the same size as vector of population genomes, so no insertion is needed.
-	/// @return @c true if scores were computed successfully, otherwise @c false
-	virtual bool run(const std::vector<std::vector<double>> &params, std::vector<double> &scores) const = 0;
-};
-
-////////////////////////////////////////////////////////////////////////////////
 // genetic algorithms
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -251,6 +216,22 @@ public:
 /// @brief Simple genetic algorithm.
 class ga_simple : public ga
 {
+public:
+	/// @brief Single individual evaluator.
+	///        It computes score (fitness) for given individual genome.
+	/// @param params individual genome
+	/// @param score evaluated score of given genome
+	/// @return @c true if score was computed successfully, otherwise @c false
+	typedef std::function<bool(const std::vector<double> &params, double &score)> evaluator_single;
+
+	/// @brief Multiple individuals evaluator.
+	///        It computes scores (fitnesses) for given population genomes.
+	/// @param params vector of the whole population genomes
+	/// @param scores evaluated scores of given genomes. Vector passed to evaluator has
+	///               the same size as vector of population genomes, so no insertion is needed.
+	/// @return @c true if scores were computed successfully, otherwise @c false
+	typedef std::function<bool(const std::vector<std::vector<double>> &params, std::vector<double> &scores)> evaluator_multi;
+
 private:
 	std::vector<std::vector<double>> limits;
 
@@ -303,14 +284,14 @@ public:
 	               const size_t &thnum);
 
 	/// @brief Runs genetic algorithm.
-	/// @param eval evaluator
+	/// @param eval evaluator. It is executed concurrently in multiple separated threads.
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
 	virtual bool run(const evaluator_single &eval, std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
-	/// @param eval evaluator
+	/// @param eval evaluator. It is executed in caller's thread;
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
@@ -323,6 +304,8 @@ private:
 	void calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const;
 	void calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const;
 	size_t find_2by2_duplicates(const std::vector<std::vector<double>> &population) const;
+
+	static void evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err);
 };
 
 } // namespace gann

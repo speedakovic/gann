@@ -2,7 +2,6 @@
 #include <gann/log.h>
 
 #include <cmath>
-#include <mutex>
 #include <thread>
 #include <random>
 #include <numeric>
@@ -361,7 +360,7 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 		return false;
 	}
 
-	if (!eval.run(population, scores)) {
+	if (!eval(population, scores)) {
 		GANN_ERR("evaluating scores failed" << std::endl);
 		return false;
 	}
@@ -416,7 +415,7 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
-		if (!eval.run(population, scores)) {
+		if (!eval(population, scores)) {
 			GANN_ERR("evaluating scores failed" << std::endl);
 			return false;
 		}
@@ -459,7 +458,7 @@ bool ga_simple::calculate_scores(const evaluator_single &eval, const std::vector
 
 		double score;
 
-		if (!eval.run(population[i], score)) {
+		if (!eval(population[i], score)) {
 			GANN_ERR("running evaluator failed" << std::endl);
 			return false;
 		}
@@ -470,43 +469,6 @@ bool ga_simple::calculate_scores(const evaluator_single &eval, const std::vector
 	scaler->run(scores, scores_scaled);
 
 	return true;
-}
-
-static void evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err)
-{
-	size_t i;
-	double score;
-	bool iserr = false;
-
-	mutex.lock();
-
-	for (;;) {
-
-		if (index >= population.size()) {
-			mutex.unlock();
-			break;
-		}
-
-		i = index++;
-
-		mutex.unlock();
-
-		if (!eval.run(population[i], score)) {
-			GANN_ERR("evaluator runner " << std::this_thread::get_id() << " failed because of running evaluator failed" << std::endl);
-			iserr = true;
-			break;
-		}
-
-		mutex.lock();
-
-		scores[i] = score;
-	}
-
-	if (iserr) {
-		mutex.lock();
-		err = 1;
-		mutex.unlock();
-	}
 }
 
 bool ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
@@ -561,6 +523,43 @@ size_t ga_simple::find_2by2_duplicates(const std::vector<std::vector<double>> &p
 		if (population[i] == population[i + 1])
 			++dups;
 	return dups;
+}
+
+void ga_simple::evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err)
+{
+	size_t i;
+	double score;
+	bool iserr = false;
+
+	mutex.lock();
+
+	for (;;) {
+
+		if (index >= population.size()) {
+			mutex.unlock();
+			break;
+		}
+
+		i = index++;
+
+		mutex.unlock();
+
+		if (!eval(population[i], score)) {
+			GANN_ERR("evaluator runner " << std::this_thread::get_id() << " failed because of running evaluator failed" << std::endl);
+			iserr = true;
+			break;
+		}
+
+		mutex.lock();
+
+		scores[i] = score;
+	}
+
+	if (iserr) {
+		mutex.lock();
+		err = 1;
+		mutex.unlock();
+	}
 }
 
 } // namespace gann
