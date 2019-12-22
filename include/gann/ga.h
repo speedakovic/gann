@@ -227,10 +227,10 @@ public:
 private:
 	std::vector<std::vector<double>> limits;
 
-	const selection_op *selection;
-	const crossover_op *crossover;
-	const mutation_op  *mutation;
-	const score_scaler *scaler;
+	const selection_op &selection;
+	const crossover_op &crossover;
+	const mutation_op  &mutation;
+	const score_scaler &scaler;
 
 	size_t popsize;
 	bool   elisize;

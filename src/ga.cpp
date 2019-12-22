@@ -205,10 +205,10 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
                      const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
                      const size_t &thnum) :
 	limits(limits),
-	selection(&selection),
-	crossover(&crossover),
-	mutation(&mutation),
-	scaler(&scaler),
+	selection(selection),
+	crossover(crossover),
+	mutation(mutation),
+	scaler(scaler),
 	popsize(popsize % 2 ? popsize + 1: popsize),
 	elisize(elisize),
 	genmax(genmax),
@@ -274,17 +274,17 @@ bool ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
-		(*selection)(scores_scaled, population);
+		selection(scores_scaled, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
 
-		(*crossover)(limits, population);
+		crossover(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after crossover: " << dups << std::endl);
 
-		(*mutation)(limits, population);
+		mutation(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after mutation: " << dups << std::endl);
@@ -342,7 +342,7 @@ bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 		return false;
 	}
 
-	(*scaler)(scores, scores_scaled);
+	scaler(scores, scores_scaled);
 
 	++gencnt;
 
@@ -371,17 +371,17 @@ bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
-		(*selection)(scores_scaled, population);
+		selection(scores_scaled, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
 
-		(*crossover)(limits, population);
+		crossover(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after crossover: " << dups << std::endl);
 
-		(*mutation)(limits, population);
+		mutation(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after mutation: " << dups << std::endl);
@@ -397,7 +397,7 @@ bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 			return false;
 		}
 
-		(*scaler)(scores, scores_scaled);
+		scaler(scores, scores_scaled);
 
 		++gencnt;
 
@@ -443,7 +443,7 @@ bool ga_simple::calculate_scores(const evaluator_single &eval, const std::vector
 		scores[i] = score;
 	}
 
-	(*scaler)(scores, scores_scaled);
+	scaler(scores, scores_scaled);
 
 	return true;
 }
@@ -465,7 +465,7 @@ bool ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vec
 	if (err)
 		return false;
 
-	(*scaler)(scores, scores_scaled);
+	scaler(scores, scores_scaled);
 
 	return true;
 }
