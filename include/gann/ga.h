@@ -205,16 +205,8 @@ public:
 // genetic algorithms
 ////////////////////////////////////////////////////////////////////////////////
 
-/// @brief Base class genetic algorithm.
-class ga
-{
-public:
-	/// @brief Destructor.
-	virtual ~ga() = default;
-};
-
 /// @brief Simple genetic algorithm.
-class ga_simple : public ga
+class ga_simple
 {
 public:
 	/// @brief Single individual evaluator.
