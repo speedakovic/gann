@@ -94,7 +94,7 @@ void crossover_op_multiple_arithmetic::run(const std::vector<std::vector<double>
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<size_t> distr_index(0, limits.size() - 1);
+	std::uniform_int_distribution<size_t> distr_index(1, limits.size());
 	std::uniform_real_distribution<double> distr_alpha(0, 1);
 
 	for (size_t i = 0; i < population.size() - 1; i += 2) {
