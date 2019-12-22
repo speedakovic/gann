@@ -213,16 +213,14 @@ public:
 	///        It computes score (fitness) for given individual genome.
 	/// @param params individual genome
 	/// @param score evaluated score of given genome
-	/// @return @c true if score was computed successfully, otherwise @c false
-	typedef std::function<bool(const std::vector<double> &params, double &score)> evaluator_single;
+	typedef std::function<void(const std::vector<double> &params, double &score)> evaluator_single;
 
 	/// @brief Multiple individuals evaluator.
 	///        It computes scores (fitnesses) for given population genomes.
 	/// @param params vector of the whole population genomes
 	/// @param scores evaluated scores of given genomes. Vector passed to evaluator has
 	///               the same size as vector of population genomes, so no insertion is needed.
-	/// @return @c true if scores were computed successfully, otherwise @c false
-	typedef std::function<bool(const std::vector<std::vector<double>> &params, std::vector<double> &scores)> evaluator_multi;
+	typedef std::function<void(const std::vector<std::vector<double>> &params, std::vector<double> &scores)> evaluator_multi;
 
 private:
 	std::vector<std::vector<double>> limits;
@@ -233,7 +231,7 @@ private:
 	const score_scaler &scaler;
 
 	size_t popsize;
-	bool   elisize;
+	size_t elisize;
 
 	size_t genmax;
 	size_t convn;
@@ -265,7 +263,6 @@ public:
 	/// @param thnum number of running threads, if zero then the number will be determined automatically.
 	///              This parameter is meaningful only for running with single individual evaluator.
 	///              Multiple individuals evaluator runs only in one (caller's) thread.
-	/// @return @c true if configuring was successful, otherwise @c false
 	ga_simple(const std::vector<std::vector<double>> &limits,
 	          const selection_op &selection, const crossover_op &crossover, const mutation_op &mutation, const score_scaler &scaler,
 	          const size_t &popsize, const size_t &elisize,
@@ -276,20 +273,18 @@ public:
 	/// @param eval evaluator. It is executed concurrently in multiple separated threads.
 	/// @param params best genome
 	/// @param score best score
-	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	bool operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const;
+	void operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. It is executed in caller's thread;
 	/// @param params best genome
 	/// @param score best score
-	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	bool operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
+	void operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
 
 private:
-	bool initialize_population(std::vector<std::vector<double>> &population) const;
-	bool calculate_scores(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
-	bool calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	void initialize_population(std::vector<std::vector<double>> &population) const;
+	void calculate_scores(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
+	void calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const;
 	void calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const;
 	void calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const;
 	size_t find_2by2_duplicates(const std::vector<std::vector<double>> &population) const;

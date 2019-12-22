@@ -7,7 +7,8 @@
 #include <numeric>
 #include <iostream>
 #include <algorithm>
-#include <functional>
+#include <exception>
+#include <stdexcept>
 
 namespace gann
 {
@@ -219,7 +220,7 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
 {}
 
 // conv = bestscore[current - convn] / bestscore[current]
-bool ga_simple::operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const
+void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -237,15 +238,9 @@ bool ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 	GANN_DBG("running simple ga with single-evaluator..." << std::endl);
 	GANN_DBG("running threads: " << thnum << std::endl);
 
-	if (!initialize_population(population)) {
-		GANN_ERR("initializing population failed" << std::endl);
-		return false;
-	}
+	initialize_population(population);
 
-	if (!calculate_scores_mt(eval, population, scores, scores_scaled)) {
-		GANN_ERR("calculating scores failed" << std::endl);
-		return false;
-	}
+	calculate_scores_mt(eval, population, scores, scores_scaled);
 
 	++gencnt;
 
@@ -295,10 +290,7 @@ bool ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
-		if (!calculate_scores_mt(eval, population, scores, scores_scaled)) {
-			GANN_ERR("calculating scores failed" << std::endl);
-			return false;
-		}
+		calculate_scores_mt(eval, population, scores, scores_scaled);
 
 		++gencnt;
 
@@ -310,12 +302,10 @@ bool ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 
 	params = population[i_scores[0]];
 	score  = scores[i_scores[0]];
-
-	return true;
 }
 
 // conv = bestscore[current - convn] / bestscore[current]
-bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const
+void ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -332,15 +322,9 @@ bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 
 	GANN_DBG("running simple ga with multi-evaluator..." << std::endl);
 
-	if (!initialize_population(population)) {
-		GANN_ERR("initializing population failed" << std::endl);
-		return false;
-	}
+	initialize_population(population);
 
-	if (!eval(population, scores)) {
-		GANN_ERR("evaluating scores failed" << std::endl);
-		return false;
-	}
+	eval(population, scores);
 
 	scaler(scores, scores_scaled);
 
@@ -392,10 +376,7 @@ bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
-		if (!eval(population, scores)) {
-			GANN_ERR("evaluating scores failed" << std::endl);
-			return false;
-		}
+		eval(population, scores);
 
 		scaler(scores, scores_scaled);
 
@@ -409,11 +390,9 @@ bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 
 	params = population[i_scores[0]];
 	score  = scores[i_scores[0]];
-
-	return true;
 }
 
-bool ga_simple::initialize_population(std::vector<std::vector<double>> &population) const
+void ga_simple::initialize_population(std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -425,30 +404,20 @@ bool ga_simple::initialize_population(std::vector<std::vector<double>> &populati
 	for (size_t i = 0; i < population.size(); ++i)
 		for (size_t j = 0; j < population[i].size(); ++j)
 			population[i][j] = distr[j](mt); // population[i][j] = (limits[j][0] + limits[j][1]) / 2;
-
-	return true;
 }
 
-bool ga_simple::calculate_scores(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
+void ga_simple::calculate_scores(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	for (size_t i = 0; i < population.size(); ++i) {
-
 		double score;
-
-		if (!eval(population[i], score)) {
-			GANN_ERR("running evaluator failed" << std::endl);
-			return false;
-		}
-
+		eval(population[i], score);
 		scores[i] = score;
 	}
 
 	scaler(scores, scores_scaled);
-
-	return true;
 }
 
-bool ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
+void ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	int err = 0;
 	size_t index = 0;
@@ -463,11 +432,9 @@ bool ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vec
 		thread.join();
 
 	if (err)
-		return false;
+		throw std::runtime_error("some evaluator runner failed");
 
 	scaler(scores, scores_scaled);
-
-	return true;
 }
 
 void ga_simple::calculate_stats(const std::vector<double> &scores, std::vector<size_t> &i_scores, double &mean_score, double &median_score) const
@@ -521,8 +488,10 @@ void ga_simple::evaluator_runner(const evaluator_single &eval, std::mutex &mutex
 
 		mutex.unlock();
 
-		if (!eval(population[i], score)) {
-			GANN_ERR("evaluator runner " << std::this_thread::get_id() << " failed because of running evaluator failed" << std::endl);
+		try {
+			eval(population[i], score);
+		} catch (const std::exception &e) {
+			GANN_ERR("evaluator runner " << std::this_thread::get_id() << " failed because evaluator failed: " << e.what() << std::endl);
 			iserr = true;
 			break;
 		}

@@ -3,6 +3,8 @@
 #include <gann/util.h>
 
 #include <cmath>
+#include <exception>
+#include <stdexcept>
 
 // network             <=> vector of layers
 // layer               <=> vector of neurons
@@ -49,25 +51,19 @@ bool mlp::operator!=(const mlp &p) const
 	return !(*this == p);
 }
 
-bool mlp::set_architecture(const std::vector<size_t> &arch)
+void mlp::set_architecture(const std::vector<size_t> &arch)
 {
-	if (arch.size() < 2) {
-		GANN_ERR("too few items in mlp architecture descriptor" << std::endl);
-		return false;
-	}
+	if (arch.size() < 2)
+		throw std::runtime_error("too few items in mlp architecture descriptor");
 
 	for (const auto &i : arch)
-		if (i == 0) {
-			GANN_ERR("zero item in mlp architecture descriptor" << std::endl);
-			return false;
-		}
+		if (i == 0)
+			throw std::runtime_error("zero item in mlp architecture descriptor");
 
 	network.resize(arch.size() - 1);
 
 	for (size_t i = 1; i < arch.size(); ++i)
 		network[i - 1] = std::vector<std::pair<std::vector<double>, activation_function>>(arch[i], std::pair<std::vector<double>,activation_function>(std::vector<double>(arch[i - 1] + 1), af_identity));
-
-	return true;
 }
 
 std::vector<size_t> mlp::get_architecture() const
@@ -84,67 +80,53 @@ std::vector<size_t> mlp::get_architecture() const
 	return arch;
 }
 
-bool mlp::set_activation_functions(const activation_function &af)
+void mlp::set_activation_functions(const activation_function &af)
 {
 	for (auto &layer : network)
 		for (auto &neuron : layer)
 			neuron.second = af;
-
-	return true;
 }
 
-bool mlp::set_activation_functions(const std::vector<activation_function> &af)
+void mlp::set_activation_functions(const std::vector<activation_function> &af)
 {
 	size_t i = 0;
 	for (const auto &layer : network)
 		i += layer.size();
 
-	if (af.size() != i) {
-		GANN_ERR("number of activation functions doesn't match the number of neurons" << std::endl);
-		return false;
-	}
+	if (af.size() != i)
+		throw std::runtime_error("number of activation functions doesn't match the number of neurons");
 
 	i = 0;
 	for (auto &layer : network)
 		for (auto &neuron : layer)
 			neuron.second = af[i++];
-
-	return true;
 }
 
-bool mlp::set_activation_functions_by_layers(const std::vector<activation_function> &af)
+void mlp::set_activation_functions_by_layers(const std::vector<activation_function> &af)
 {
-	if (af.size() != network.size()) {
-		GANN_ERR("number of activation functions doesn't match the number of layers" << std::endl);
-		return false;
-	}
+	if (af.size() != network.size())
+		throw std::runtime_error("number of activation functions doesn't match the number of layers");
 
 	for (size_t i = 0; i < af.size(); ++i)
 		for (auto &neuron : network[i])
 			neuron.second = af[i];
-
-	return true;
 }
 
-bool mlp::set_weights(const std::vector<double> &weights)
+void mlp::set_weights(const std::vector<double> &weights)
 {
 	size_t i = 0;
 	for (const auto &layer : network)
 		for (const auto &neuron : layer)
 			i += neuron.first.size();
 
-	if (weights.size() != i) {
-		GANN_ERR("number of weights doesn't match" << std::endl);
-		return false;
-	}
+	if (weights.size() != i)
+		throw std::runtime_error("number of weights doesn't match");
 
 	i = 0;
 	for (auto &layer : network)
 		for (auto &neuron : layer)
 			for (auto &weight : neuron.first)
 				weight = weights[i++];
-
-	return true;
 }
 
 std::vector<double> mlp::get_weights() const
@@ -161,28 +143,28 @@ std::vector<double> mlp::get_weights() const
 
 std::vector<double> mlp::propagate(const std::vector<double> &in)
 {
-	if (network.empty()) {
-		GANN_ERR("empty network" << std::endl);
-		return {};
-	}
+	if (network.empty())
+		throw std::runtime_error("empty network");
 
 	std::vector<double> inputs = in;
 	std::vector<double> outputs;
 
 	for (const auto &layer : network) {
+
 		outputs.clear();
+
 		for (const auto &neuron : layer) {
 
-			if (inputs.size() != neuron.first.size() - 1) {
-				GANN_ERR("number of inputs doesn't match the number of weights" << std::endl);
-				return {};
-			}
+			if (inputs.size() != neuron.first.size() - 1)
+				throw std::runtime_error("number of inputs doesn't match the number of weights");
 
 			double output = 0;
 			for (size_t i = 0; i < neuron.first.size() - 1; ++i)
 				output += neuron.first[i] * inputs[i];
+
 			outputs.push_back(neuron.second(output + neuron.first.back()));
 		}
+
 		inputs = outputs;
 	}
 

@@ -46,8 +46,7 @@ public:
 	///             All neurons in layer 'i' have number of weights (inputs) equal number of neurons
 	///             in layer 'i-1' plus one (last one) represeting neuron's bias.
 	///
-	/// @return @c true if setting was successful, otherwise @c false
-	bool set_architecture(const std::vector<size_t> &arch);
+	void set_architecture(const std::vector<size_t> &arch);
 
 	/// @brief Gets network architecture.
 	/// @return architecture descriptor
@@ -55,26 +54,22 @@ public:
 
 	/// @brief Sets activation functions.
 	/// @param af one activation function to be set to all neurons
-	/// @return @c true if setting was successful, otherwise @c false
-	bool set_activation_functions(const activation_function &af);
+	void set_activation_functions(const activation_function &af);
 
 	/// @brief Sets activation functions.
 	/// @param af activation functions to be set,
 	///           number of activation functions must be equal number of neurons
-	/// @return @c true if setting was successful, otherwise @c false
-	bool set_activation_functions(const std::vector<activation_function> &af);
+	void set_activation_functions(const std::vector<activation_function> &af);
 
 	/// @brief Sets activation functions.
 	/// @param af activation functions to be set,
 	///           number of activation functions must be equal number of layers
-	/// @return @c true if setting was successful, otherwise @c false
-	bool set_activation_functions_by_layers(const std::vector<activation_function> &af);
+	void set_activation_functions_by_layers(const std::vector<activation_function> &af);
 
 	/// @brief Sets weights.
 	/// @param weights weights to be set,
 	///                number of weights must be equal number of weights across all existing neurons
-	/// @return @c true if setting was successful, otherwise @c false
-	bool set_weights(const std::vector<double> &weights);
+	void set_weights(const std::vector<double> &weights);
 
 	/// @brief Gets weights.
 	/// @return weights
@@ -82,7 +77,7 @@ public:
 
 	/// @brief Propagates input vector through network and returns resulting output vector.
 	/// @param in input vector, its size must be equal number of inputs specified in network architecture
-	/// @return output vector, its size equals number of neurons in last layer or it is empty if some error occurred
+	/// @return output vector, its size equals number of neurons in last layer
 	std::vector<double> propagate(const std::vector<double> &in);
 
 	/// @name Activation functions.

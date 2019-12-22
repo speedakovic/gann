@@ -17,16 +17,15 @@ static const size_t CONVN    = 50;
 static const double CONVNMAX = .99;
 static const double SCOREMAX = std::nan("");
 
-bool evaluator_single(const std::vector<double> &params, double &score)
+void evaluator_single(const std::vector<double> &params, double &score)
 {
 	double x = params[0];
 	double y = params[1];
 	double z = pow(x - X, 2) + pow(y - Y, 2);
 	score = 1 / z;
-	return true;
 };
 
-bool evaluator_multi(const std::vector<std::vector<double>> &params, std::vector<double> &scores)
+void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector<double> &scores)
 {
 	for (size_t i = 0; i < params.size(); ++i) {
 		double x = params[i][0];
@@ -34,7 +33,6 @@ bool evaluator_multi(const std::vector<std::vector<double>> &params, std::vector
 		double z = pow(x - X, 2) + pow(y - Y, 2);
 		scores[i] = 1 / z;
 	}
-	return true;
 };
 
 int main()
@@ -53,10 +51,7 @@ int main()
 	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0);
 
 	auto begin = std::chrono::steady_clock::now();
-	if (!ga(evaluator_multi, best_params, best_score)) {
-		std::cerr << "running genetic algorithm failed" << std::endl;
-		return EXIT_FAILURE;
-	}
+	ga(evaluator_multi, best_params, best_score);
 	auto end = std::chrono::steady_clock::now();
 
 	std::cout << "duration [us]   : " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
