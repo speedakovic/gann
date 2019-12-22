@@ -16,7 +16,7 @@ namespace gann
 // selection operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void selection_op_roulette::run(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
+void selection_op_roulette::operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
 {
 	double s = std::accumulate(scores.begin(), scores.end(), 0.);
 
@@ -66,7 +66,7 @@ void selection_op_roulette::run(const std::vector<double> &scores, std::vector<s
 // crossover operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void crossover_op_single_arithmetic::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void crossover_op_single_arithmetic::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -89,7 +89,7 @@ void crossover_op_single_arithmetic::run(const std::vector<std::vector<double>> 
 	}
 }
 
-void crossover_op_multiple_arithmetic::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void crossover_op_multiple_arithmetic::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -123,7 +123,7 @@ void crossover_op_multiple_arithmetic::run(const std::vector<std::vector<double>
 // mutation operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void mutation_op_uniform::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_uniform::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -143,7 +143,7 @@ void mutation_op_uniform::run(const std::vector<std::vector<double>> &limits, st
 	}
 }
 
-void mutation_op_normal::run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_normal::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -174,18 +174,18 @@ void mutation_op_normal::run(const std::vector<std::vector<double>> &limits, std
 // score scalers
 ////////////////////////////////////////////////////////////////////////////////
 
-void score_scaler_none::run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
+void score_scaler_none::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	std::copy(scores.begin(), scores.end(), scores_scaled.begin());
 }
 
-void score_scaler_offset::run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
+void score_scaler_offset::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	double tmp = *std::min_element(scores.begin(), scores.end());
 	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
 }
 
-void score_scaler_linear::run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
+void score_scaler_linear::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	double tmp = *std::min_element(scores.begin(), scores.end());
 	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
@@ -219,7 +219,7 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
 {}
 
 // conv = bestscore[current - convn] / bestscore[current]
-bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, double &score) const
+bool ga_simple::operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -274,17 +274,17 @@ bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, d
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
-		selection->run(scores_scaled, population);
+		(*selection)(scores_scaled, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
 
-		crossover->run(limits, population);
+		(*crossover)(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after crossover: " << dups << std::endl);
 
-		mutation ->run(limits, population);
+		(*mutation)(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after mutation: " << dups << std::endl);
@@ -315,7 +315,7 @@ bool ga_simple::run(const evaluator_single &eval, std::vector<double> &params, d
 }
 
 // conv = bestscore[current - convn] / bestscore[current]
-bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, double &score) const
+bool ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -342,7 +342,7 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 		return false;
 	}
 
-	scaler->run(scores, scores_scaled);
+	(*scaler)(scores, scores_scaled);
 
 	++gencnt;
 
@@ -371,17 +371,17 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
-		selection->run(scores_scaled, population);
+		(*selection)(scores_scaled, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
 
-		crossover->run(limits, population);
+		(*crossover)(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after crossover: " << dups << std::endl);
 
-		mutation ->run(limits, population);
+		(*mutation)(limits, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after mutation: " << dups << std::endl);
@@ -397,7 +397,7 @@ bool ga_simple::run(const evaluator_multi &eval, std::vector<double> &params, do
 			return false;
 		}
 
-		scaler->run(scores, scores_scaled);
+		(*scaler)(scores, scores_scaled);
 
 		++gencnt;
 
@@ -443,7 +443,7 @@ bool ga_simple::calculate_scores(const evaluator_single &eval, const std::vector
 		scores[i] = score;
 	}
 
-	scaler->run(scores, scores_scaled);
+	(*scaler)(scores, scores_scaled);
 
 	return true;
 }
@@ -465,7 +465,7 @@ bool ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vec
 	if (err)
 		return false;
 
-	scaler->run(scores, scores_scaled);
+	(*scaler)(scores, scores_scaled);
 
 	return true;
 }

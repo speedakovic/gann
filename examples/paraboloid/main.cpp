@@ -53,7 +53,7 @@ int main()
 	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0);
 
 	auto begin = std::chrono::steady_clock::now();
-	if (!ga.run(evaluator_multi, best_params, best_score)) {
+	if (!ga(evaluator_multi, best_params, best_score)) {
 		std::cerr << "running genetic algorithm failed" << std::endl;
 		return EXIT_FAILURE;
 	}

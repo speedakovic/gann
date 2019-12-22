@@ -27,7 +27,7 @@ public:
 	/// @brief Runs operator.
 	/// @param scores population scores
 	/// @param population population genomes
-	virtual void run(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const = 0;
+	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const = 0;
 };
 
 /// @brief Roulette selection operator.
@@ -43,7 +43,7 @@ public:
 	explicit selection_op_roulette(size_t extra_runs = 1) : extra_runs(extra_runs) {};
 
 	/// @copydoc selection_op::run
-	virtual void run(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ public:
 	/// @brief Runs operator.
 	/// @param limits genome limits
 	/// @param population population genomes
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
 };
 
 /// @brief Single crossover operator.
@@ -80,7 +80,7 @@ class crossover_op_single_arithmetic : public crossover_op
 {
 public:
 	/// @copydoc crossover_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Multiple crossover operator.
@@ -96,7 +96,7 @@ class crossover_op_multiple_arithmetic : public crossover_op
 {
 public:
 	/// @copydoc crossover_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ public:
 	/// @brief Runs operator.
 	/// @param limits genome limits
 	/// @param population population genomes
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
 };
 
 /// @brief Uniform mutation operator.
@@ -133,7 +133,7 @@ public:
 	explicit mutation_op_uniform(double p = 0.01) : p(p) {};
 
 	/// @copydoc mutation_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Normal mutation operator.
@@ -154,7 +154,7 @@ public:
 	explicit mutation_op_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {};
 
 	/// @copydoc mutation_op::run
-	virtual void run(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ public:
 	/// @brief Runs scaler.
 	/// @param scores population scores
 	/// @param scores_scaled scaled population scores
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const = 0;
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const = 0;
 };
 
 /// @brief None scaler.
@@ -180,7 +180,7 @@ class score_scaler_none : public score_scaler
 {
 public:
 	/// @copydoc score_scaler::run
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
 /// @brief Offset scaler.
@@ -189,7 +189,7 @@ class score_scaler_offset : public score_scaler
 {
 public:
 	/// @copydoc score_scaler::run
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
 /// @brief Linear scaler.
@@ -198,7 +198,7 @@ class score_scaler_linear : public score_scaler
 {
 public:
 	/// @copydoc score_scaler::run
-	virtual void run(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,14 +277,14 @@ public:
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	bool run(const evaluator_single &eval, std::vector<double> &params, double &score) const;
+	bool operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. It is executed in caller's thread;
 	/// @param params best genome
 	/// @param score best score
 	/// @return @c true if genetic algorithm finished succsessfully, otherwise @c false
-	bool run(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
+	bool operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
 
 private:
 	bool initialize_population(std::vector<std::vector<double>> &population) const;
