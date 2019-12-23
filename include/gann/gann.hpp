@@ -282,13 +282,15 @@ public:
 	          const size_t &thnum);
 
 	/// @brief Runs genetic algorithm.
-	/// @param eval evaluator. It is executed concurrently in multiple separated threads.
+	/// @param eval evaluator. If thnum or number of automatically detected threads equals one,
+	///             then it is executed sequentially in caller's thread,
+	///             otherwise it is executed concurrently in multiple separated threads.
 	/// @param params best genome
 	/// @param score best score
 	void operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
-	/// @param eval evaluator. It is executed in caller's thread;
+	/// @param eval evaluator. It is executed sequentially in caller's thread;
 	/// @param params best genome
 	/// @param score best score
 	void operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const;

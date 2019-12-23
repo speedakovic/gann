@@ -242,7 +242,10 @@ void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 
 	initialize_population(population);
 
-	calculate_scores_mt(eval, population, scores, scores_scaled);
+	if (thnum == 1)
+		calculate_scores(eval, population, scores, scores_scaled);
+	else
+		calculate_scores_mt(eval, population, scores, scores_scaled);
 
 	++gencnt;
 
@@ -292,7 +295,10 @@ void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
-		calculate_scores_mt(eval, population, scores, scores_scaled);
+		if (thnum == 1)
+			calculate_scores(eval, population, scores, scores_scaled);
+		else
+			calculate_scores_mt(eval, population, scores, scores_scaled);
 
 		++gencnt;
 
