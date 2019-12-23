@@ -3,8 +3,8 @@ project(gann)
 
 find_package(Threads)
 
-set(GANN_SRC src/ga.cpp src/mlp.cpp src/util.cpp)
-set(GANN_HDR include/gann/ga.h include/gann/mlp.h include/gann/util.h include/gann/log.h)
+set(GANN_SRC src/gann.cpp)
+set(GANN_HDR include/gann/gann.hpp)
 
 include_directories(include)
 

@@ -1,19 +1,34 @@
-#ifndef GA_H
-#define GA_H
+#ifndef GANN_HPP
+#define GANN_HPP
 
 #include <mutex>
 #include <queue>
 #include <vector>
+#include <ostream>
 #include <functional>
 
 namespace gann
 {
+////////////////////////////////////////////////////////////////////////////////
+// utils
+////////////////////////////////////////////////////////////////////////////////
+
+template<typename T>
+std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
+{
+	out << '[';
+	for (size_t i = 0; i < x.size(); ++i)
+		out << x[i] << (i < x.size() - 1 ? ", " : "");
+	out << "]";
+	return out;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // selection operators
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for selection operator.
+///
 ///        The result of selection (population vector), which immediately
 ///        goes to crossover, should maintain the same size and be produced
 ///        in this form: {parent1, parent2, parent1, parent2, parent1, parent2, ...}
@@ -31,6 +46,7 @@ public:
 };
 
 /// @brief Roulette selection operator.
+///
 ///        The given scores must be positive, so appropriate scaler should be used.
 class selection_op_roulette : public selection_op
 {
@@ -42,7 +58,6 @@ public:
 	///        second parent to be different from the first one.
 	explicit selection_op_roulette(size_t extra_runs = 1) : extra_runs(extra_runs) {};
 
-	/// @copydoc selection_op::run
 	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
 
@@ -51,6 +66,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for crossover operator.
+///
 ///        The crossover operator should await the selected population
 ///        in this form: {parent1, parent2, parent1, parent2, parent1, parent2, ...}
 ///        The result of crossover (population vector), which immediately
@@ -68,6 +84,7 @@ public:
 };
 
 /// @brief Single crossover operator.
+///
 ///        Each two neighbouring individuals are crossovered into new two ones.
 ///        Single parameter index 'i' is randomly selected.
 ///        Random value 'alpha' is selected from uniform distribution U(0,1).
@@ -79,11 +96,11 @@ public:
 class crossover_op_single_arithmetic : public crossover_op
 {
 public:
-	/// @copydoc crossover_op::run
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Multiple crossover operator.
+///
 ///        Each two neighbouring individuals are crossovered into new two ones.
 ///        Multiple parameter indexes 'i' are randomly selected.
 ///        For each 'i' random value 'alpha' is selected from uniform distribution U(0,1).
@@ -95,7 +112,6 @@ public:
 class crossover_op_multiple_arithmetic : public crossover_op
 {
 public:
-	/// @copydoc crossover_op::run
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
@@ -104,6 +120,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Base class for mutation operator.
+///
 ///        The result of mutation (population vector), which immediately
 ///        goes to conditional elitism process and then to evaluation, should maintain the same size.
 class mutation_op
@@ -119,10 +136,10 @@ public:
 };
 
 /// @brief Uniform mutation operator.
+///
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then random parameter is selected and mutated by replacing with value
 ///        from uniform distribution U(limit[i][0], limit[i][1])
-///
 class mutation_op_uniform : public mutation_op
 {
 private:
@@ -132,15 +149,14 @@ public:
 	/// @param p probability of mutation of one individual
 	explicit mutation_op_uniform(double p = 0.01) : p(p) {};
 
-	/// @copydoc mutation_op::run
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Normal mutation operator.
+///
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then random parameter is selected and mutated by adding a value
 ///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
-///
 class mutation_op_normal : public mutation_op
 {
 private:
@@ -153,7 +169,6 @@ public:
 	///          stddev = c * (limit[i][1] - limit[i][0])
 	explicit mutation_op_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {};
 
-	/// @copydoc mutation_op::run
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
@@ -179,7 +194,6 @@ public:
 class score_scaler_none : public score_scaler
 {
 public:
-	/// @copydoc score_scaler::run
 	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
@@ -188,7 +202,6 @@ public:
 class score_scaler_offset : public score_scaler
 {
 public:
-	/// @copydoc score_scaler::run
 	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
@@ -197,7 +210,6 @@ public:
 class score_scaler_linear : public score_scaler
 {
 public:
-	/// @copydoc score_scaler::run
 	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
@@ -292,7 +304,96 @@ private:
 	static void evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err);
 };
 
+////////////////////////////////////////////////////////////////////////////////
+// multi-layer perceptron
+////////////////////////////////////////////////////////////////////////////////
+
+/// @brief Multi-layer perceptron.
+class mlp
+{
+public:
+	/// @brief Activation function.
+	typedef double (*activation_function)(double);
+
+private:
+	std::vector<std::vector<std::pair<std::vector<double>, activation_function>>> network;
+
+public:
+	/// @brief Default constructor.
+	mlp();
+
+	/// @brief Copy constructor.
+	mlp(const mlp &p);
+
+	/// @brief Move constructor.
+	mlp(mlp &&p);
+
+	//!@{
+	mlp& operator=(const mlp &p);
+	mlp& operator=(mlp &&p);
+
+	bool operator==(const mlp &p) const;
+	bool operator!=(const mlp &p) const;
+	//!@}
+
+	/// @brief Sets network architecture.
+	/// @param arch architecture descriptor
+	///             arch[0] - number of inputs (length of input vector)
+	///             arch[1] - number of neurons in first layer
+	///             arch[2] - number of neurons in second layer
+	///             arch[n] - number of neurons in nth layer
+	///
+	///             All neurons in layer 'i' have number of weights (inputs) equal number of neurons
+	///             in layer 'i-1' plus one (last one) represeting neuron's bias.
+	///
+	void set_architecture(const std::vector<size_t> &arch);
+
+	/// @brief Gets network architecture.
+	/// @return architecture descriptor
+	std::vector<size_t> get_architecture() const;
+
+	/// @brief Sets activation functions.
+	/// @param af one activation function to be set to all neurons
+	void set_activation_functions(const activation_function &af);
+
+	/// @brief Sets activation functions.
+	/// @param af activation functions to be set,
+	///           number of activation functions must be equal number of neurons
+	void set_activation_functions(const std::vector<activation_function> &af);
+
+	/// @brief Sets activation functions.
+	/// @param af activation functions to be set,
+	///           number of activation functions must be equal number of layers
+	void set_activation_functions_by_layers(const std::vector<activation_function> &af);
+
+	/// @brief Sets weights.
+	/// @param weights weights to be set,
+	///                number of weights must be equal number of weights across all existing neurons
+	void set_weights(const std::vector<double> &weights);
+
+	/// @brief Gets weights.
+	/// @return weights
+	std::vector<double> get_weights() const;
+
+	/// @brief Propagates input vector through network and returns resulting output vector.
+	/// @param in input vector, its size must be equal number of inputs specified in network architecture
+	/// @return output vector, its size equals number of neurons in last layer
+	std::vector<double> propagate(const std::vector<double> &in);
+
+	/// @name Activation functions.
+	//!@{
+	static double af_identity(double x);
+	static double af_step(double x);
+	static double af_symmetric_step(double x);
+	static double af_logistic(double x);
+	static double af_tanh(double x);
+	//!@}
+
+	/// @brief Output stream operator.
+	friend std::ostream& operator<<(std::ostream &os, const mlp &p);
+};
+
 } // namespace gann
 
-#endif // GA_H
+#endif // GANN_HPP
 

@@ -1,4 +1,4 @@
-#include <gann/gann.h>
+#include <gann/gann.hpp>
 
 #include <cmath>
 #include <cstdlib>
