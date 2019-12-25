@@ -303,7 +303,7 @@ private:
 	void calculate_convergence(double &conv, std::queue<double> &best_scores, const double &best_score) const;
 	size_t find_2by2_duplicates(const std::vector<std::vector<double>> &population) const;
 
-	static void evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err);
+	static void evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, std::exception_ptr &eptr);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -427,20 +427,35 @@ void ga_simple::calculate_scores(const evaluator_single &eval, const std::vector
 
 void ga_simple::calculate_scores_mt(const evaluator_single &eval, const std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
-	int err = 0;
 	size_t index = 0;
 	std::mutex mutex;
 	std::vector<std::thread> threads;
+	std::vector<std::exception_ptr> eptrs(thnum);
+
+	threads.reserve(thnum);
 
 	for (size_t i = 0; i < thnum; ++i)
 		threads.push_back(std::thread(evaluator_runner, std::cref(eval),
-						  std::ref(mutex), std::cref(population), std::ref(scores), std::ref(index), std::ref(err)));
+		                  std::ref(mutex), std::cref(population), std::ref(scores), std::ref(index),
+		                  std::ref(eptrs[i])));
 
-	for(auto &thread : threads)
+	for (auto &thread : threads)
 		thread.join();
 
-	if (err)
-		throw std::runtime_error("some evaluator runner failed");
+	std::string errmsg;
+	for (size_t i = 0; i < thnum; ++i) {
+		if (eptrs[i]) {
+			try {
+				std::rethrow_exception(eptrs[i]);
+			} catch (const std::exception & e) {
+				errmsg.append(" #").append(std::to_string(i)).append(": ").append(e.what());
+			} catch (...) {
+				errmsg.append(" #").append(std::to_string(i)).append(": <unknown exception>");
+			}
+		}
+	}
+	if (!errmsg.empty())
+		throw std::runtime_error("some evaluator runners failed:" + errmsg);
 
 	scaler(scores, scores_scaled);
 }
@@ -477,43 +492,30 @@ size_t ga_simple::find_2by2_duplicates(const std::vector<std::vector<double>> &p
 	return dups;
 }
 
-void ga_simple::evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, int &err)
-{
+void ga_simple::evaluator_runner(const evaluator_single &eval, std::mutex &mutex, const std::vector<std::vector<double>> &population, std::vector<double> &scores, size_t &index, std::exception_ptr &eptr)
+try {
 	size_t i;
 	double score;
-	bool iserr = false;
-
-	mutex.lock();
+	std::unique_lock<std::mutex> lock(mutex);
 
 	for (;;) {
 
-		if (index >= population.size()) {
-			mutex.unlock();
+		if (index >= population.size())
 			break;
-		}
 
 		i = index++;
 
-		mutex.unlock();
+		lock.unlock();
 
-		try {
-			eval(population[i], score);
-		} catch (const std::exception &e) {
-			GANN_ERR("evaluator runner " << std::this_thread::get_id() << " failed because evaluator failed: " << e.what() << std::endl);
-			iserr = true;
-			break;
-		}
+		eval(population[i], score);
 
-		mutex.lock();
+		lock.lock();
 
 		scores[i] = score;
 	}
 
-	if (iserr) {
-		mutex.lock();
-		err = 1;
-		mutex.unlock();
-	}
+} catch (...) {
+	eptr = std::current_exception();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
