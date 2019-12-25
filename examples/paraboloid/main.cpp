@@ -23,7 +23,7 @@ void evaluator_single(const std::vector<double> &params, double &score)
 	double y = params[1];
 	double z = pow(x - X, 2) + pow(y - Y, 2);
 	score = 1 / z;
-};
+}
 
 void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector<double> &scores)
 {
@@ -33,7 +33,14 @@ void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector
 		double z = pow(x - X, 2) + pow(y - Y, 2);
 		scores[i] = 1 / z;
 	}
-};
+}
+
+void statistics_listener(const gann::ga_simple::statistics &stats)
+{
+	std::cout << "gen: " << stats.generation << ", best: " << stats.best_score
+	          << ", mean: " << stats.mean_score << ", median: " << stats. median_score
+	          << ", conv: " << stats.convergence << std::endl;
+}
 
 int main()
 {
@@ -51,7 +58,7 @@ int main()
 	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0);
 
 	auto begin = std::chrono::steady_clock::now();
-	ga(evaluator_multi, best_params, best_score);
+	ga(evaluator_multi, statistics_listener, best_params, best_score);
 	auto end = std::chrono::steady_clock::now();
 
 	std::cout << "duration [us]   : " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;

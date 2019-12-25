@@ -222,7 +222,8 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
 {}
 
 // conv = bestscore[current - convn] / bestscore[current]
-void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const
+void ga_simple::operator()(const evaluator_single &eval, const statistics_listener &stats_listener,
+                           std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -252,7 +253,11 @@ void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 	calculate_stats(scores, i_scores, mean_score, median_score);
 	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
 
-	GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	if (stats_listener) {
+		statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+		stats_listener(stats);
+	}
 
 	while (true) {
 
@@ -305,7 +310,11 @@ void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 		calculate_stats(scores, i_scores, mean_score, median_score);
 		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
 		
-		GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+		if (stats_listener) {
+			statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+			stats_listener(stats);
+		}
 	}
 
 	params = population[i_scores[0]];
@@ -313,7 +322,8 @@ void ga_simple::operator()(const evaluator_single &eval, std::vector<double> &pa
 }
 
 // conv = bestscore[current - convn] / bestscore[current]
-void ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const
+void ga_simple::operator()(const evaluator_multi &eval, const statistics_listener &stats_listener,
+                           std::vector<double> &params, double &score) const
 {
 	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
@@ -341,7 +351,11 @@ void ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 	calculate_stats(scores, i_scores, mean_score, median_score);
 	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
 
-	GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	if (stats_listener) {
+		statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+		stats_listener(stats);
+	}
 
 	while (true) {
 
@@ -393,7 +407,11 @@ void ga_simple::operator()(const evaluator_multi &eval, std::vector<double> &par
 		calculate_stats(scores, i_scores, mean_score, median_score);
 		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
 
-		GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+		if (stats_listener) {
+			statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+			stats_listener(stats);
+		}
 	}
 
 	params = population[i_scores[0]];

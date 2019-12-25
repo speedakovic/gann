@@ -221,6 +221,16 @@ public:
 class ga_simple
 {
 public:
+	/// @brief Statistics.
+	struct statistics
+	{
+		size_t generation;   ///< Generation number
+		double best_score;   ///< Best score
+		double mean_score;   ///< Mean score
+		double median_score; ///< Median score
+		double convergence;  ///< Convergence
+	};
+
 	/// @brief Single individual evaluator.
 	///        It computes score (fitness) for given individual genome.
 	/// @param params individual genome
@@ -233,6 +243,10 @@ public:
 	/// @param scores evaluated scores of given genomes. Vector passed to evaluator has
 	///               the same size as vector of population genomes, so no insertion is needed.
 	typedef std::function<void(const std::vector<std::vector<double>> &params, std::vector<double> &scores)> evaluator_multi;
+
+	/// @brief Statistics listener.
+	/// @param stats statistics
+	typedef std::function<void(const statistics &stats)> statistics_listener;
 
 private:
 	const std::vector<std::vector<double>> limits;
@@ -285,15 +299,19 @@ public:
 	/// @param eval evaluator. If thnum or number of automatically detected threads equals one,
 	///             then it is executed sequentially in caller's thread,
 	///             otherwise it is executed concurrently in multiple separated threads.
+	/// @param stats_listener Called after each generation has been evaluated.
 	/// @param params best genome
 	/// @param score best score
-	void operator()(const evaluator_single &eval, std::vector<double> &params, double &score) const;
+	void operator()(const evaluator_single &eval, const statistics_listener &stats_listener,
+	                std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. It is executed sequentially in caller's thread;
+	/// @param stats_listener Called after each generation has been evaluated.
 	/// @param params best genome
 	/// @param score best score
-	void operator()(const evaluator_multi &eval, std::vector<double> &params, double &score) const;
+	void operator()(const evaluator_multi &eval, const statistics_listener &stats_listener,
+	                std::vector<double> &params, double &score) const;
 
 private:
 	void initialize_population(std::vector<std::vector<double>> &population) const;
