@@ -235,22 +235,22 @@ public:
 	typedef std::function<void(const std::vector<std::vector<double>> &params, std::vector<double> &scores)> evaluator_multi;
 
 private:
-	std::vector<std::vector<double>> limits;
+	const std::vector<std::vector<double>> limits;
 
 	const selection_op &selection;
 	const crossover_op &crossover;
 	const mutation_op  &mutation;
 	const score_scaler &scaler;
 
-	size_t popsize;
-	size_t elisize;
+	const size_t popsize;
+	const size_t elisize;
 
-	size_t genmax;
-	size_t convn;
-	double convmax;
-	double scoremax;
+	const size_t genmax;
+	const size_t convn;
+	const double convmax;
+	const double scoremax;
 
-	size_t thnum;
+	const size_t thnum;
 
 public:
 	/// @brief Constructor.
