@@ -20,8 +20,8 @@ void selection_op_roulette::operator()(const std::vector<double> &scores, std::v
 {
 	double s = std::accumulate(scores.begin(), scores.end(), 0.);
 
-	checknormal(s);
-	checkgreater(s, 0.);
+	checknormal(s, "not-normal number in roulette selection operator");
+	checkgreater(s, 0., "not-greater than zero number in roulette selection operator");
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -189,7 +189,6 @@ void score_scaler_linear::operator()(const std::vector<double> &scores, std::vec
 	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
 
 	tmp = *std::max_element(scores_scaled.begin(), scores_scaled.end());
-	checknormal(tmp);
 	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&tmp](const double &score){return score / tmp;});
 }
 
@@ -238,15 +237,15 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 
 	initialize_population(population);
 
-	checkfinite(population);
+	checkfinite(population, "not-finite number in population");
 
 	if (thnum == 1)
 		calculate_scores(eval, population, scores, scores_scaled);
 	else
 		calculate_scores_mt(eval, population, scores, scores_scaled);
 
-	checkfinite(scores);
-	checkfinite(scores_scaled);
+	checkfinite(scores, "not-finite number in scores");
+	checkfinite(scores_scaled, "not-finite number in scaled scores");
 
 	++gencnt;
 
@@ -302,15 +301,15 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
-		checkfinite(population);
+		checkfinite(population, "not-finite number in population");
 
 		if (thnum == 1)
 			calculate_scores(eval, population, scores, scores_scaled);
 		else
 			calculate_scores_mt(eval, population, scores, scores_scaled);
 
-		checkfinite(scores);
-		checkfinite(scores_scaled);
+		checkfinite(scores, "not-finite number in scores");
+		checkfinite(scores_scaled, "not-finite number in scaled scores");
 
 		++gencnt;
 
@@ -351,13 +350,13 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 
 	initialize_population(population);
 
-	checkfinite(population);
+	checkfinite(population, "not-finite number in population");
 
 	eval(population, scores);
 	scaler(scores, scores_scaled);
 
-	checkfinite(scores);
-	checkfinite(scores_scaled);
+	checkfinite(scores, "not-finite number in scores");
+	checkfinite(scores_scaled, "not-finite number in scaled scores");
 
 	++gencnt;
 
@@ -413,13 +412,13 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
-		checkfinite(population);
+		checkfinite(population, "not-finite number in population");
 
 		eval(population, scores);
 		scaler(scores, scores_scaled);
 
-		checkfinite(scores);
-		checkfinite(scores_scaled);
+		checkfinite(scores, "not-finite number in scores");
+		checkfinite(scores_scaled, "not-finite number in scaled scores");
 
 		++gencnt;
 

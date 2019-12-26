@@ -67,73 +67,73 @@ bool isnormal(const std::vector<std::vector<T>> &vv)
 
 
 template<typename T>
-void checkfinite(const T &x)
+void checkfinite(const T &x, const std::string &msg = "not-finite number")
 {
 	if (!std::isfinite(x))
-		throw std::runtime_error("not-finite floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checkfinite(const std::vector<T> &v)
+void checkfinite(const std::vector<T> &v, const std::string &msg = "not-finite number")
 {
 	if (!isfinite(v))
-		throw std::runtime_error("not-finite floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checkfinite(const std::vector<std::vector<T>> &vv)
+void checkfinite(const std::vector<std::vector<T>> &vv, const std::string &msg = "not-finite number")
 {
 	if (!isfinite(vv))
-		throw std::runtime_error("not-finite floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checknormal(const T &x)
+void checknormal(const T &x, const std::string &msg = "not-normal number")
 {
 	if (!std::isnormal(x))
-		throw std::runtime_error("not-normal floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checknormal(const std::vector<T> &v)
+void checknormal(const std::vector<T> &v, const std::string &msg = "not-normal number")
 {
 	if (!isnormal(v))
-		throw std::runtime_error("not-normal floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checknormal(const std::vector<std::vector<T>> &vv)
+void checknormal(const std::vector<std::vector<T>> &vv, const std::string &msg = "not-normal number")
 {
 	if (!isnormal(vv))
-		throw std::runtime_error("not-normal floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checkgreater(const T &x, const T &y)
+void checkgreater(const T &x, const T &y, const std::string &msg = "not-greater number")
 {
 	if (!std::isgreater(x, y))
-		throw std::runtime_error("not-greater floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checknotgreater(const T &x, const T &y)
+void checknotgreater(const T &x, const T &y, const std::string &msg = "greater number")
 {
 	if (std::isgreater(x, y))
-		throw std::runtime_error("greater floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checkless(const T &x, const T &y)
+void checkless(const T &x, const T &y, const std::string &msg = "not-less number")
 {
 	if (!std::isless(x, y))
-		throw std::runtime_error("not-less floating point number");
+		throw std::runtime_error(msg);
 }
 
 template<typename T>
-void checknotless(const T &x, const T &y)
+void checknotless(const T &x, const T &y, const std::string &msg = "less number")
 {
 	if (std::isless(x, y))
-		throw std::runtime_error("less floating point number");
+		throw std::runtime_error(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
