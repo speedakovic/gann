@@ -251,11 +251,11 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 	++gencnt;
 
 	calculate_stats(scores, i_scores, mean_score, median_score);
-	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+	calculate_convergence(conv, best_scores, scores[i_scores.front()]);
 
-	//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores.front()] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 	if (stats_listener) {
-		statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+		statistics stats{gencnt, scores[i_scores.front()], mean_score, median_score, conv};
 		stats_listener(stats);
 	}
 
@@ -271,7 +271,7 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 			break;
 		}
 
-		if (!std::isnan(scoremax) && scores[i_scores[0]] >= scoremax) {
+		if (!std::isnan(scoremax) && scores[i_scores.front()] >= scoremax) {
 			GANN_DBG("maximum score reached" << std::endl);
 			break;
 		}
@@ -308,17 +308,17 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 		++gencnt;
 
 		calculate_stats(scores, i_scores, mean_score, median_score);
-		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+		calculate_convergence(conv, best_scores, scores[i_scores.front()]);
 		
-		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores.front()] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 		if (stats_listener) {
-			statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+			statistics stats{gencnt, scores[i_scores.front()], mean_score, median_score, conv};
 			stats_listener(stats);
 		}
 	}
 
-	params = population[i_scores[0]];
-	score  = scores[i_scores[0]];
+	params = population[i_scores.front()];
+	score  = scores[i_scores.front()];
 }
 
 // conv = bestscore[current - convn] / bestscore[current]
@@ -349,11 +349,11 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 	++gencnt;
 
 	calculate_stats(scores, i_scores, mean_score, median_score);
-	calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+	calculate_convergence(conv, best_scores, scores[i_scores.front()]);
 
-	//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+	//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores.front()] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 	if (stats_listener) {
-		statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+		statistics stats{gencnt, scores[i_scores.front()], mean_score, median_score, conv};
 		stats_listener(stats);
 	}
 
@@ -369,7 +369,7 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 			break;
 		}
 
-		if (!std::isnan(scoremax) && scores[i_scores[0]] >= scoremax) {
+		if (!std::isnan(scoremax) && scores[i_scores.front()] >= scoremax) {
 			GANN_DBG("maximum score reached" << std::endl);
 			break;
 		}
@@ -405,17 +405,17 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 		++gencnt;
 
 		calculate_stats(scores, i_scores, mean_score, median_score);
-		calculate_convergence(conv, best_scores, scores[i_scores[0]]);
+		calculate_convergence(conv, best_scores, scores[i_scores.front()]);
 
-		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores[0]] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
+		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores.front()] << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 		if (stats_listener) {
-			statistics stats{gencnt, scores[i_scores[0]], mean_score, median_score, conv};
+			statistics stats{gencnt, scores[i_scores.front()], mean_score, median_score, conv};
 			stats_listener(stats);
 		}
 	}
 
-	params = population[i_scores[0]];
-	score  = scores[i_scores[0]];
+	params = population[i_scores.front()];
+	score  = scores[i_scores.front()];
 }
 
 void ga_simple::initialize_population(std::vector<std::vector<double>> &population) const
