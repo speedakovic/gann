@@ -37,8 +37,9 @@ void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector
 
 void statistics_listener(const gann::ga_simple::statistics &stats)
 {
-	std::cout << "gen: " << stats.generation << ", best: " << stats.best_score
-	          << ", mean: " << stats.mean_score << ", median: " << stats. median_score
+	std::cout << "gen: " << stats.generation
+	          << ", best: " << stats.best_score << ", worst: " << stats.worst_score
+	          << ", mean: " << stats.mean_score << ", median: " << stats.median_score
 	          << ", conv: " << stats.convergence << std::endl;
 }
 

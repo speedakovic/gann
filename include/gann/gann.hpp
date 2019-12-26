@@ -226,6 +226,7 @@ public:
 	{
 		size_t generation;   ///< Generation number
 		double best_score;   ///< Best score
+		double worst_score;  ///< Worst score
 		double mean_score;   ///< Mean score
 		double median_score; ///< Median score
 		double convergence;  ///< Convergence
