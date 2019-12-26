@@ -238,6 +238,8 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 
 	initialize_population(population);
 
+	checkfinite(population);
+
 	if (thnum == 1)
 		calculate_scores(eval, population, scores, scores_scaled);
 	else
@@ -300,6 +302,8 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
+		checkfinite(population);
+
 		if (thnum == 1)
 			calculate_scores(eval, population, scores, scores_scaled);
 		else
@@ -346,6 +350,8 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 	GANN_DBG("running simple ga with multi-evaluator..." << std::endl);
 
 	initialize_population(population);
+
+	checkfinite(population);
 
 	eval(population, scores);
 	scaler(scores, scores_scaled);
@@ -406,6 +412,8 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
+
+		checkfinite(population);
 
 		eval(population, scores);
 		scaler(scores, scores_scaled);
