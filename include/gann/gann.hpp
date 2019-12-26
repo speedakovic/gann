@@ -1,10 +1,13 @@
 #ifndef GANN_HPP
 #define GANN_HPP
 
+#include <cmath>
 #include <mutex>
 #include <queue>
 #include <vector>
 #include <ostream>
+#include <exception>
+#include <stdexcept>
 #include <functional>
 
 namespace gann
@@ -21,6 +24,74 @@ std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
 		out << x[i] << (i < x.size() - 1 ? ", " : "");
 	out << "]";
 	return out;
+}
+
+template<typename T>
+bool isnormal(const std::vector<T> &v)
+{
+	for (const auto &x : v)
+		if (!std::isnormal(x))
+			return false;
+	return true;
+}
+
+template<typename T>
+bool isnormal(const std::vector<std::vector<T>> &vv)
+{
+	for (const auto &v : vv)
+		for (const auto &x : v)
+			if (!std::isnormal(x))
+				return false;
+	return true;
+}
+
+template<typename T>
+void checknormal(const T &x)
+{
+	if (!std::isnormal(x))
+		throw std::runtime_error("not-normal floating point number");
+}
+
+template<typename T>
+void checknormal(const std::vector<T> &v)
+{
+	if (!isnormal(v))
+		throw std::runtime_error("not-normal floating point number");
+}
+
+template<typename T>
+void checknormal(const std::vector<std::vector<T>> &vv)
+{
+	if (!isnormal(vv))
+		throw std::runtime_error("not-normal floating point number");
+}
+
+template<typename T>
+void checkgreater(const T &x, const T &y)
+{
+	if (!std::isgreater(x, y))
+		throw std::runtime_error("not-greater floating point number");
+}
+
+template<typename T>
+void checknotgreater(const T &x, const T &y)
+{
+	if (std::isgreater(x, y))
+		throw std::runtime_error("greater floating point number");
+}
+
+template<typename T>
+void checkless(const T &x, const T &y)
+{
+	if (!std::isless(x, y))
+		throw std::runtime_error("not-less floating point number");
+}
+
+template<typename T>
+void checknotless(const T &x, const T &y)
+{
+	if (std::isless(x, y))
+		throw std::runtime_error("less floating point number");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

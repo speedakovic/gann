@@ -1,13 +1,10 @@
 #include <gann/gann.hpp>
 
-#include <cmath>
 #include <thread>
 #include <random>
 #include <numeric>
 #include <iostream>
 #include <algorithm>
-#include <exception>
-#include <stdexcept>
 
 #define GANN_DBG(x) do {std::cerr << x;} while(0);
 #define GANN_ERR(x) do {std::cerr << x;} while(0);
@@ -23,10 +20,8 @@ void selection_op_roulette::operator()(const std::vector<double> &scores, std::v
 {
 	double s = std::accumulate(scores.begin(), scores.end(), 0.);
 
-	if (!std::isnormal(s) || !std::isgreater(s, 0.)) {
-		GANN_ERR("unexpected scores, selection by copy" << std::endl);
-		return;
-	}
+	checknormal(s);
+	checkgreater(s, 0.);
 
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -194,8 +189,8 @@ void score_scaler_linear::operator()(const std::vector<double> &scores, std::vec
 	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
 
 	tmp = *std::max_element(scores_scaled.begin(), scores_scaled.end());
-	if (std::isnormal(tmp))
-		std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&tmp](const double &score){return score / tmp;});
+	checknormal(tmp);
+	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&tmp](const double &score){return score / tmp;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
