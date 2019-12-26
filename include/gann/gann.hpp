@@ -26,6 +26,26 @@ std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
 	return out;
 }
 
+
+template<typename T>
+bool isfinite(const std::vector<T> &v)
+{
+	for (const auto &x : v)
+		if (!std::isfinite(x))
+			return false;
+	return true;
+}
+
+template<typename T>
+bool isfinite(const std::vector<std::vector<T>> &vv)
+{
+	for (const auto &v : vv)
+		for (const auto &x : v)
+			if (!std::isfinite(x))
+				return false;
+	return true;
+}
+
 template<typename T>
 bool isnormal(const std::vector<T> &v)
 {
@@ -43,6 +63,28 @@ bool isnormal(const std::vector<std::vector<T>> &vv)
 			if (!std::isnormal(x))
 				return false;
 	return true;
+}
+
+
+template<typename T>
+void checkfinite(const T &x)
+{
+	if (!std::isfinite(x))
+		throw std::runtime_error("not-finite floating point number");
+}
+
+template<typename T>
+void checkfinite(const std::vector<T> &v)
+{
+	if (!isfinite(v))
+		throw std::runtime_error("not-finite floating point number");
+}
+
+template<typename T>
+void checkfinite(const std::vector<std::vector<T>> &vv)
+{
+	if (!isfinite(vv))
+		throw std::runtime_error("not-finite floating point number");
 }
 
 template<typename T>

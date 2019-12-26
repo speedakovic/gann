@@ -243,6 +243,9 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 	else
 		calculate_scores_mt(eval, population, scores, scores_scaled);
 
+	checkfinite(scores);
+	checkfinite(scores_scaled);
+
 	++gencnt;
 
 	calculate_stats(scores, i_scores, mean_score, median_score);
@@ -302,6 +305,9 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 		else
 			calculate_scores_mt(eval, population, scores, scores_scaled);
 
+		checkfinite(scores);
+		checkfinite(scores_scaled);
+
 		++gencnt;
 
 		calculate_stats(scores, i_scores, mean_score, median_score);
@@ -342,8 +348,10 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 	initialize_population(population);
 
 	eval(population, scores);
-
 	scaler(scores, scores_scaled);
+
+	checkfinite(scores);
+	checkfinite(scores_scaled);
 
 	++gencnt;
 
@@ -400,8 +408,10 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
 		eval(population, scores);
-
 		scaler(scores, scores_scaled);
+
+		checkfinite(scores);
+		checkfinite(scores_scaled);
 
 		++gencnt;
 
