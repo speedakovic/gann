@@ -6,8 +6,11 @@
 #include <iostream>
 #include <algorithm>
 
-#define GANN_DBG(x) do {std::cerr << x;} while(0);
-#define GANN_ERR(x) do {std::cerr << x;} while(0);
+#ifdef NDEBUG
+	#define GANN_DBG(x)
+#else
+	#define GANN_DBG(x) do {std::cerr << x;} while(0);
+#endif
 
 namespace gann
 {
