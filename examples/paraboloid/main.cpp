@@ -22,7 +22,7 @@ void evaluator_single(const std::vector<double> &params, double &score)
 	double x = params[0];
 	double y = params[1];
 	double z = pow(x - X, 2) + pow(y - Y, 2);
-	score = 1 / z;
+	score = 1 / gann::nz(z);
 }
 
 void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector<double> &scores)
@@ -31,7 +31,7 @@ void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector
 		double x = params[i][0];
 		double y = params[i][1];
 		double z = pow(x - X, 2) + pow(y - Y, 2);
-		scores[i] = 1 / z;
+		scores[i] = 1 / gann::nz(z);
 	}
 }
 

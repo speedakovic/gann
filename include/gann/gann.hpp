@@ -5,6 +5,7 @@
 #include <mutex>
 #include <queue>
 #include <vector>
+#include <limits>
 #include <ostream>
 #include <exception>
 #include <stdexcept>
@@ -24,6 +25,37 @@ std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
 		out << x[i] << (i < x.size() - 1 ? ", " : "");
 	out << "]";
 	return out;
+}
+
+
+template<typename T>
+double nz(const T &x)
+{
+	return x == 0.0 ? std::numeric_limits<T>::epsilon() : x;
+}
+
+template<typename T>
+double clamp(const T &x)
+{
+	if (x == std::numeric_limits<T>::infinity())
+		return std::numeric_limits<T>::max();
+	else if (x == -std::numeric_limits<T>::infinity())
+		return std::numeric_limits<T>::lowest();
+	else
+		return x;
+}
+
+template<typename T>
+double clamp_nz(const T &x)
+{
+	if (x == std::numeric_limits<T>::infinity())
+		return std::numeric_limits<T>::max();
+	else if (x == -std::numeric_limits<T>::infinity())
+		return std::numeric_limits<T>::lowest();
+	else if (x == 0.0)
+		return std::numeric_limits<T>::epsilon();
+	else
+		return x;
 }
 
 
