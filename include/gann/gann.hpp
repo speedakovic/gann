@@ -318,9 +318,25 @@ public:
 	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
 };
 
+/// @brief Offset scaler (non-zero).
+///        This scaler just shifts the scores minimum to zero + eps.
+class score_scaler_offset_nz : public score_scaler
+{
+public:
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
+};
+
 /// @brief Linear scaler.
 ///        This scaler scales the scores to the interval [0,1]
 class score_scaler_linear : public score_scaler
+{
+public:
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;
+};
+
+/// @brief Linear scaler (non-zero).
+///        This scaler scales the scores to the interval (0,1]
+class score_scaler_linear_nz : public score_scaler
 {
 public:
 	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override;

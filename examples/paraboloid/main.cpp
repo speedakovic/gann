@@ -50,7 +50,7 @@ int main()
 	gann::selection_op_roulette            selection(10);
 	gann::crossover_op_multiple_arithmetic crossover;
 	gann::mutation_op_normal               mutation(0.2);
-	gann::score_scaler_linear              scaler;
+	gann::score_scaler_linear_nz           scaler;
 
 	std::vector<double> best_params;
 	double best_score;

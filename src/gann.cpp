@@ -2,6 +2,7 @@
 
 #include <thread>
 #include <random>
+#include <limits>
 #include <numeric>
 #include <iostream>
 #include <algorithm>
@@ -183,9 +184,24 @@ void score_scaler_offset::operator()(const std::vector<double> &scores, std::vec
 	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
 }
 
+void score_scaler_offset_nz::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
+{
+	double tmp = *std::min_element(scores.begin(), scores.end()) - std::numeric_limits<double>::epsilon();;
+	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
+}
+
 void score_scaler_linear::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
 	double tmp = *std::min_element(scores.begin(), scores.end());
+	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
+
+	tmp = *std::max_element(scores_scaled.begin(), scores_scaled.end());
+	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&tmp](const double &score){return score / tmp;});
+}
+
+void score_scaler_linear_nz::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
+{
+	double tmp = *std::min_element(scores.begin(), scores.end()) - std::numeric_limits<double>::epsilon();
 	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
 
 	tmp = *std::max_element(scores_scaled.begin(), scores_scaled.end());
