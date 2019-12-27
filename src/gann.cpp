@@ -253,6 +253,7 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 	initialize_population(population);
 
 	checkfinite(population, "not-finite number in population");
+	checkparamsetswithinlimits(limits, population, "population parameters not within limits");
 
 	if (thnum == 1)
 		calculate_scores(eval, population, scores, scores_scaled);
@@ -317,6 +318,7 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
 		checkfinite(population, "not-finite number in population");
+		checkparamsetswithinlimits(limits, population, "population parameters not within limits");
 
 		if (thnum == 1)
 			calculate_scores(eval, population, scores, scores_scaled);
@@ -366,6 +368,7 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 	initialize_population(population);
 
 	checkfinite(population, "not-finite number in population");
+	checkparamsetswithinlimits(limits, population, "population parameters not within limits");
 
 	eval(population, scores);
 	scaler(scores, scores_scaled);
@@ -428,6 +431,7 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 		//	GANN_DBG("2by2 duplicates after elitism: " << dups << std::endl);
 
 		checkfinite(population, "not-finite number in population");
+		checkparamsetswithinlimits(limits, population, "population parameters not within limits");
 
 		eval(population, scores);
 		scaler(scores, scores_scaled);

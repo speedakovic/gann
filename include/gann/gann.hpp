@@ -97,6 +97,17 @@ bool isnormal(const std::vector<std::vector<T>> &vv)
 	return true;
 }
 
+template <typename T>
+bool areparamsetswithinlimits(const std::vector<std::vector<T>> &limits,
+                              const std::vector<std::vector<T>> &paramsets)
+{
+	for (size_t i = 0; i < limits.size(); ++i)
+		if (!limits[i][2])
+			for (const auto &paramset : paramsets)
+				if (paramset[i] < limits[i][0] || paramset[i] > limits[i][1])
+					return false;
+	return true;
+}
 
 template<typename T>
 void checkfinite(const T &x, const std::string &msg = "not-finite number")
@@ -165,6 +176,15 @@ template<typename T>
 void checknotless(const T &x, const T &y, const std::string &msg = "less number")
 {
 	if (std::isless(x, y))
+		throw std::runtime_error(msg);
+}
+
+template <typename T>
+bool checkparamsetswithinlimits(const std::vector<std::vector<T>> &limits,
+                                const std::vector<std::vector<T>> &paramsets,
+                                const std::string &msg = "paramsets not within limits")
+{
+	if (!areparamsetswithinlimits(limits, paramsets))
 		throw std::runtime_error(msg);
 }
 
