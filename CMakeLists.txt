@@ -25,5 +25,8 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 add_executable(paraboloid examples/paraboloid/main.cpp)
+configure_file(examples/paraboloid/scripts/paraboloid_stats.gpi paraboloid_stats.gpi COPYONLY)
+configure_file(examples/paraboloid/scripts/paraboloid_run.sh paraboloid_run.sh COPYONLY)
+
 target_link_libraries(paraboloid ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
