@@ -24,7 +24,7 @@ if(DOXYGEN_FOUND)
                       COMMENT "Generating documentation" VERBATIM)
 endif(DOXYGEN_FOUND)
 
-add_executable(paraboloid examples/paraboloid/main.cpp)
+add_executable(paraboloid examples/paraboloid/src/paraboloid.cpp)
 configure_file(examples/paraboloid/scripts/paraboloid_stats.gpi paraboloid_stats.gpi COPYONLY)
 configure_file(examples/paraboloid/scripts/paraboloid_run.sh paraboloid_run.sh COPYONLY)
 
