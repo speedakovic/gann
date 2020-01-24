@@ -708,7 +708,7 @@ std::vector<double> mlp::get_weights() const
 	return weights;
 }
 
-std::vector<double> mlp::propagate(const std::vector<double> &in)
+std::vector<double> mlp::propagate(const std::vector<double> &in) const
 {
 	if (network.empty())
 		throw std::runtime_error("empty network");

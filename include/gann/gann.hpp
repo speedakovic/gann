@@ -603,7 +603,7 @@ public:
 	/// @brief Propagates input vector through network and returns resulting output vector.
 	/// @param in input vector, its size must be equal number of inputs specified in network architecture
 	/// @return output vector, its size equals number of neurons in last layer
-	std::vector<double> propagate(const std::vector<double> &in);
+	std::vector<double> propagate(const std::vector<double> &in) const;
 
 	/// @name Activation functions.
 	//!@{
