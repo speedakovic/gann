@@ -21,7 +21,7 @@ static const double SCOREMAX = std::nan("");
 
 static const char* STATS_FILENAME = "paraboloid_stats.txt";
 
-void evaluator_single(const std::vector<double> &params, double &score)
+static void evaluator_single(const std::vector<double> &params, double &score)
 {
 	double x = params[0];
 	double y = params[1];
@@ -29,7 +29,7 @@ void evaluator_single(const std::vector<double> &params, double &score)
 	score = 1 / gann::nz(z);
 }
 
-void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector<double> &scores)
+static void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector<double> &scores)
 {
 	for (size_t i = 0; i < params.size(); ++i) {
 		double x = params[i][0];
@@ -39,7 +39,7 @@ void evaluator_multi(const std::vector<std::vector<double>> &params, std::vector
 	}
 }
 
-void statistics_listener(std::fstream &stats_file, const gann::ga_simple::statistics &stats)
+static void statistics_listener(std::fstream &stats_file, const gann::ga_simple::statistics &stats)
 {
 	std::cout << "gen: " << stats.generation
 	          << ", best: " << stats.best_score << ", worst: " << stats.worst_score
