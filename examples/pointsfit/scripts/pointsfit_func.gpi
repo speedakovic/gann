@@ -1,0 +1,8 @@
+set terminal x11
+set grid
+set title 'Evolved fitting function'
+set xlabel 'x'
+set ylabel 'y'
+plot [:] [:] 'pointsfit_func.txt' using 1:2 index 0 with lines title 'function',\
+             'pointsfit_func.txt' using 1:2 index 1 with points pt 2 ps 2 lw 2 title 'points'
+

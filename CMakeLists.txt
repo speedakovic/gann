@@ -28,5 +28,11 @@ add_executable(paraboloid examples/paraboloid/src/paraboloid.cpp)
 configure_file(examples/paraboloid/scripts/paraboloid_stats.gpi paraboloid_stats.gpi COPYONLY)
 configure_file(examples/paraboloid/scripts/paraboloid_run.sh paraboloid_run.sh COPYONLY)
 
+add_executable(pointsfit examples/pointsfit/src/pointsfit.cpp)
+configure_file(examples/pointsfit/scripts/pointsfit_stats.gpi pointsfit_stats.gpi COPYONLY)
+configure_file(examples/pointsfit/scripts/pointsfit_func.gpi pointsfit_func.gpi COPYONLY)
+configure_file(examples/pointsfit/scripts/pointsfit_run.sh pointsfit_run.sh COPYONLY)
+
 target_link_libraries(paraboloid ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(pointsfit ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 

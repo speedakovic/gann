@@ -1,0 +1,8 @@
+set terminal x11
+set grid
+set title 'Statistics'
+set xlabel 'generation'
+set ylabel 'error'
+plot [:] [0.0:1.0] 'pointsfit_stats.txt' using 1:2 with lines title 'best',\
+                   'pointsfit_stats.txt' using 1:3 with lines title 'mean',\
+                   'pointsfit_stats.txt' using 1:4 with lines title 'median'
