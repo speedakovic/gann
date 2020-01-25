@@ -127,8 +127,8 @@ void crossover_op_single_arithmetic::operator()(const std::vector<std::vector<do
 		double ind1_par = ind1[index];
 		double ind2_par = ind2[index];
 
-		ind1[index] = ind1_par * alpha	+ ind2_par * (1 - alpha);
-		ind2[index] = ind2_par * alpha	+ ind1_par * (1 - alpha);
+		ind1[index] = ind1_par * alpha	+ ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+		ind2[index] = ind2_par * alpha	+ ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
 	}
 }
 
@@ -156,8 +156,8 @@ void crossover_op_multiple_arithmetic::operator()(const std::vector<std::vector<
 			double ind1_par = ind1[index];
 			double ind2_par = ind2[index];
 
-			ind1[index] = ind1_par * alpha	+ ind2_par * (1 - alpha);
-			ind2[index] = ind2_par * alpha	+ ind1_par * (1 - alpha);
+			ind1[index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind2[index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
 		}
 	}
 }
