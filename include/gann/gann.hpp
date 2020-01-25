@@ -249,6 +249,22 @@ public:
 	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
 
+/// @brief Tournament selection operator.
+class selection_op_tournament : public selection_op
+{
+private:
+	const size_t competitors_num;
+	const size_t extra_runs;
+public:
+	/// @brief Constructor.
+	/// @param competitors_num number of competitors in each tournament
+	/// @param extra_runs number of extra tournament runs for the each
+	///        second parent to be different from the first one.
+	explicit selection_op_tournament(size_t competitors_num = 2, size_t extra_runs = 1) : competitors_num(competitors_num), extra_runs(extra_runs) {}
+
+	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // crossover operators
 ////////////////////////////////////////////////////////////////////////////////

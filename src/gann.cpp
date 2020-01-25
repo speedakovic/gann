@@ -63,6 +63,48 @@ void selection_op_roulette::operator()(const std::vector<double> &scores, std::v
 	}
 }
 
+void selection_op_tournament::operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<size_t> distr(0, population.size() - 1);
+
+	std::vector<std::vector<double>> population_old(population);
+
+	for (size_t i = 0; i < population.size() - 1; i += 2) {
+
+		size_t extra_run = extra_runs;
+		size_t i0, i1;
+
+		{
+			std::vector<size_t> competitors_i;
+			std::vector<size_t> competitors_s;
+			for (size_t j = 0; j < competitors_num; ++j) {
+				size_t index = distr(mt);
+				competitors_i.push_back(index);
+				competitors_s.push_back(scores[index]);
+			}
+			i0 = competitors_i[std::distance(competitors_s.begin(), std::max_element(competitors_s.begin(), competitors_s.end()))];
+		}
+
+		{
+			std::vector<size_t> competitors_i;
+			std::vector<size_t> competitors_s;
+			for (size_t j = 0; j < competitors_num; ++j) {
+				size_t index = distr(mt);
+				competitors_i.push_back(index);
+				competitors_s.push_back(scores[index]);
+			}
+			i1 = competitors_i[std::distance(competitors_s.begin(), std::max_element(competitors_s.begin(), competitors_s.end()))];
+
+		} while (population_old[i0] == population_old[i1] && extra_run--);
+
+		population[i    ] = population_old[i0];
+		population[i + 1] = population_old[i1];
+
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // crossover operators
 ////////////////////////////////////////////////////////////////////////////////
