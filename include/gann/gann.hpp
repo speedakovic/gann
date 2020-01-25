@@ -28,30 +28,6 @@ std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
 }
 
 template<typename T>
-bool approximately_equal(T a, T b)
-{
-	return abs(a - b) <= ((abs(a) < abs(b) ? abs(b) : abs(a)) * std::numeric_limits<T>::epsilon());
-}
-
-template<typename T>
-bool essentially_equal(T a, T b)
-{
-	return abs(a - b) <= ((abs(a) > abs(b) ? abs(b) : abs(a)) * std::numeric_limits<T>::epsilon());
-}
-
-template<typename T>
-bool definitely_greater_than(T a, T b)
-{
-	return (a - b) > ((abs(a) < abs(b) ? abs(b) : abs(a)) * std::numeric_limits<T>::epsilon());
-}
-
-template<typename T>
-bool definitely_less_than(T a, T b)
-{
-	return (b - a) > ((abs(a) < abs(b) ? abs(b) : abs(a)) * std::numeric_limits<T>::epsilon());
-}
-
-template<typename T>
 double nz(const T &x)
 {
 	return x == 0.0 ? std::numeric_limits<T>::epsilon() : x;
@@ -127,7 +103,7 @@ bool areparamsetswithinlimits(const std::vector<std::vector<T>> &limits,
 	for (size_t i = 0; i < limits.size(); ++i)
 		if (!limits[i][2])
 			for (const auto &paramset : paramsets)
-				if (definitely_less_than(paramset[i], limits[i][0]) || definitely_greater_than(paramset[i], limits[i][1]))
+				if (std::isless(paramset[i], limits[i][0]) || std::isgreater(paramset[i], limits[i][1]))
 					return false;
 	return true;
 }
