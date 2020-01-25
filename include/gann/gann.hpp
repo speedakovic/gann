@@ -244,7 +244,7 @@ public:
 	/// @brief Constructor.
 	/// @param extra_runs number of extra roulette wheel runs for the each
 	///        second parent to be different from the first one.
-	explicit selection_op_roulette(size_t extra_runs = 1) : extra_runs(extra_runs) {};
+	explicit selection_op_roulette(size_t extra_runs = 1) : extra_runs(extra_runs) {}
 
 	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
@@ -335,7 +335,7 @@ private:
 public:
 	/// @brief Constructor.
 	/// @param p probability of mutation of one individual
-	explicit mutation_op_uniform(double p = 0.01) : p(p) {};
+	explicit mutation_op_uniform(double p = 0.01) : p(p) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
@@ -355,7 +355,7 @@ public:
 	/// @param p probability of mutation of one individual
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
-	explicit mutation_op_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {};
+	explicit mutation_op_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
