@@ -212,6 +212,37 @@ void mutation_op_single_normal::operator()(const std::vector<std::vector<double>
 	}
 }
 
+void mutation_op_multiple_normal::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
+	std::uniform_int_distribution<size_t> distr_param_index(0, limits.size());
+	std::vector<std::normal_distribution<double>> distr_param;
+
+	for (const auto &limit : limits)
+		distr_param.push_back(std::normal_distribution<double>(0., c * (limit[1] - limit[0])));
+
+	for (auto &ind : population) {
+		size_t pop_index = distr_pop_index(mt);
+		if (pop_index < population.size()) {
+			std::vector<size_t> param_indexes(limits.size());
+			std::iota(param_indexes.begin(), param_indexes.end(), 0);
+			std::shuffle(param_indexes.begin(), param_indexes.end(), mt);
+			param_indexes.resize(distr_param_index(mt));
+			for (const auto &param_index : param_indexes) {
+				ind[param_index] += distr_param[param_index](mt);
+				if (!static_cast<int>(limits[param_index][2])) {
+					if (ind[param_index] < limits[param_index][0])
+						ind[param_index] = limits[param_index][0];
+					else if (ind[param_index] > limits[param_index][1])
+						ind[param_index] = limits[param_index][1];
+				}
+			}
+		}
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // score scalers
 ////////////////////////////////////////////////////////////////////////////////

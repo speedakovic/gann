@@ -352,6 +352,26 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
+/// @brief Multiple normal mutation operator.
+///
+///        Each individual is selected for mutation with probability 'p'.
+///        Then multiple random parameters are selected and mutated by adding values
+///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
+class mutation_op_multiple_normal : public mutation_op
+{
+private:
+	const double p;
+	const double c;
+public:
+	/// @brief Constructor.
+	/// @param p probability of mutation of one individual
+	/// @param c constant used to derive standard deviation parameter of normal distribution
+	///          stddev = c * (limit[i][1] - limit[i][0])
+	explicit mutation_op_multiple_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
+
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // score scalers
 ////////////////////////////////////////////////////////////////////////////////
