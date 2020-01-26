@@ -263,7 +263,7 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
 };
 
-/// @brief Single crossover operator.
+/// @brief Single arithmetic crossover operator.
 ///
 ///        Each two neighbouring individuals are crossovered into new two ones.
 ///        Single parameter index 'i' is randomly selected.
@@ -279,7 +279,7 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
-/// @brief Multiple crossover operator.
+/// @brief Multiple arithmetic crossover operator.
 ///
 ///        Each two neighbouring individuals are crossovered into new two ones.
 ///        Multiple parameter indexes 'i' are randomly selected.
@@ -315,10 +315,10 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
 };
 
-/// @brief Uniform mutation operator.
+/// @brief Single uniform mutation operator.
 ///
 ///        Each individual is selected for mutation with probability 'p'.
-///        Then random parameter is selected and mutated by replacing with value
+///        Then single random parameter is selected and mutated by replacing with value
 ///        from uniform distribution U(limit[i][0], limit[i][1])
 class mutation_op_single_uniform : public mutation_op
 {
@@ -332,10 +332,10 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
-/// @brief Normal mutation operator.
+/// @brief Single normal mutation operator.
 ///
 ///        Each individual is selected for mutation with probability 'p'.
-///        Then random parameter is selected and mutated by adding a value
+///        Then single random parameter is selected and mutated by adding value
 ///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
 class mutation_op_single_normal : public mutation_op
 {
