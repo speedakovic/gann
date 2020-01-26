@@ -243,6 +243,34 @@ void mutation_op_multiple_normal::operator()(const std::vector<std::vector<doubl
 	}
 }
 
+void mutation_op_multiple_normal_2::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
+	std::uniform_int_distribution<size_t> distr_param_index(0, limits.size() / q - 1);
+	std::vector<std::normal_distribution<double>> distr_param;
+
+	for (const auto &limit : limits)
+		distr_param.push_back(std::normal_distribution<double>(0., c * (limit[1] - limit[0])));
+
+	for (auto &ind : population) {
+		if (distr_pop_index(mt) < population.size()) {
+			for (size_t param_index = 0; param_index < limits.size(); ++param_index) {
+				if (distr_param_index(mt) < limits.size()) {
+					ind[param_index] += distr_param[param_index](mt);
+					if (!static_cast<int>(limits[param_index][2])) {
+						if (ind[param_index] < limits[param_index][0])
+							ind[param_index] = limits[param_index][0];
+						else if (ind[param_index] > limits[param_index][1])
+							ind[param_index] = limits[param_index][1];
+					}
+				}
+			}
+		}
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // score scalers
 ////////////////////////////////////////////////////////////////////////////////
