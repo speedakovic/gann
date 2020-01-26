@@ -344,7 +344,7 @@ private:
 	const double c;
 public:
 	/// @brief Constructor.
-	/// @param p probability of mutation of one individual
+	/// @param p probability of mutation of each individual
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
 	explicit mutation_op_single_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
@@ -364,7 +364,7 @@ private:
 	const double c;
 public:
 	/// @brief Constructor.
-	/// @param p probability of mutation of one individual
+	/// @param p probability of mutation of each individual
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
 	explicit mutation_op_multiple_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
