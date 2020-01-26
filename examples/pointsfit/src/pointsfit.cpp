@@ -123,7 +123,10 @@ int main()
 
 	gann::selection_op_tournament          selection(2, 10);
 	gann::crossover_op_multiple_arithmetic crossover;
+	//gann::mutation_op_single_uniform       mutation(0.5);
 	gann::mutation_op_single_normal        mutation(0.5);
+	//gann::mutation_op_multiple_normal      mutation(0.5, 0.01);
+	//gann::mutation_op_multiple_normal_2    mutation(0.5, 0.03);
 	gann::score_scaler_none                scaler;
 
 	std::vector<double> best_params;
