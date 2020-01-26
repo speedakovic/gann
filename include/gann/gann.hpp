@@ -320,14 +320,14 @@ public:
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then random parameter is selected and mutated by replacing with value
 ///        from uniform distribution U(limit[i][0], limit[i][1])
-class mutation_op_uniform : public mutation_op
+class mutation_op_single_uniform : public mutation_op
 {
 private:
 	const double p;
 public:
 	/// @brief Constructor.
 	/// @param p probability of mutation of one individual
-	explicit mutation_op_uniform(double p = 0.01) : p(p) {}
+	explicit mutation_op_single_uniform(double p = 0.01) : p(p) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
@@ -337,7 +337,7 @@ public:
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then random parameter is selected and mutated by adding a value
 ///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
-class mutation_op_normal : public mutation_op
+class mutation_op_single_normal : public mutation_op
 {
 private:
 	const double p;
@@ -347,7 +347,7 @@ public:
 	/// @param p probability of mutation of one individual
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
-	explicit mutation_op_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
+	explicit mutation_op_single_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };

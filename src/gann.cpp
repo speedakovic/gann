@@ -166,7 +166,7 @@ void crossover_op_multiple_arithmetic::operator()(const std::vector<std::vector<
 // mutation operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void mutation_op_uniform::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_single_uniform::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -186,7 +186,7 @@ void mutation_op_uniform::operator()(const std::vector<std::vector<double>> &lim
 	}
 }
 
-void mutation_op_normal::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_single_normal::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
