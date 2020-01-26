@@ -201,14 +201,13 @@ void mutation_op_single_normal::operator()(const std::vector<std::vector<double>
 		size_t pop_index = distr_pop_index(mt);
 		if (pop_index < population.size()) {
 			size_t param_index = distr_param_index(mt);
-			double param = distr_param[param_index](mt);
+			ind[param_index] += distr_param[param_index](mt);
 			if (!static_cast<int>(limits[param_index][2])) {
-				if (param < limits[param_index][0])
-					param = limits[param_index][0];
-				else if (param > limits[param_index][1])
-					param = limits[param_index][1];
+				if (ind[param_index] < limits[param_index][0])
+					ind[param_index] = limits[param_index][0];
+				else if (ind[param_index] > limits[param_index][1])
+					ind[param_index] = limits[param_index][1];
 			}
-			ind[param_index] = param;
 		}
 	}
 }
