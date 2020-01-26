@@ -19,10 +19,10 @@ static const std::vector<double> SINGLE_LIMITS = {-10, 10, 0};
 
 static const size_t POPSIZE  = 100;
 static const size_t ELISIZE  = 5;
-static const size_t GENMAX   = 1000;
-static const size_t CONVN    = 100;
+static const size_t GENMAX   = 10000;
+static const size_t CONVN    = 1000;
 static const double CONVNMAX = .99;
-static const double SCOREMAX = std::nan("");
+static const double SCOREMAX = 10000.;//std::nan("");
 
 static const char* STATS_FILENAME = "pointsfit_stats.txt";
 static const char* FUNC_FILENAME = "pointsfit_func.txt";
@@ -121,10 +121,10 @@ int main()
 
 	std::fstream stats_file(STATS_FILENAME, std::ios::out);
 
-	gann::selection_op_roulette            selection(10);
+	gann::selection_op_tournament          selection(2, 10);
 	gann::crossover_op_multiple_arithmetic crossover;
-	gann::mutation_op_normal               mutation(0.2);
-	gann::score_scaler_linear_nz           scaler;
+	gann::mutation_op_normal               mutation(0.5);
+	gann::score_scaler_none                scaler;
 
 	std::vector<double> best_params;
 	double best_score;
