@@ -121,13 +121,24 @@ int main()
 
 	std::fstream stats_file(STATS_FILENAME, std::ios::out);
 
-	gann::selection_op_tournament          selection(2, 10);
-	gann::crossover_op_multiple_arithmetic crossover;
-	//gann::mutation_op_single_uniform       mutation(0.5);
-	gann::mutation_op_single_normal        mutation(0.5);
-	//gann::mutation_op_multiple_normal      mutation(0.5, 0.01);
-	//gann::mutation_op_multiple_normal_2    mutation(0.5, 0.03);
-	gann::score_scaler_none                scaler;
+	gann::selection_op_tournament              selection(2, 10);
+
+	//gann::crossover_op_arithmetic_single       crossover;    //#1
+	gann::crossover_op_arithmetic_all          crossover;    //#2
+	//gann::crossover_op_arithmetic_multiple_fix crossover(1); //#3, same as #1, but slower
+	//gann::crossover_op_arithmetic_multiple_fix crossover(0); //#4, same as #2, but slower
+	//gann::crossover_op_arithmetic_multiple_rnd crossover(1); //#5, same as #1, but slower
+
+	//gann::mutation_op_uniform_single           mutation(0.5);            //#1
+	gann::mutation_op_normal_single            mutation(0.5);            //#2
+	//gann::mutation_op_normal_all               mutation(0.5, 0.005);     //#3
+	//gann::mutation_op_normal_multiple_fix      mutation(0.5, 1, 0.25);   //#4, same as #2, but slower
+	//gann::mutation_op_normal_multiple_fix      mutation(0.5, 0, 0.005);  //#5, same as #3, but slower
+	//gann::mutation_op_normal_multiple_rnd      mutation(0.5, 1);         //#6, same as #2, but slower
+	//gann::mutation_op_normal_multiple_rnd2     mutation(0.5, 0.03);      //#7, similar to #2, but slower
+	//gann::mutation_op_normal_multiple_rnd2     mutation(0.5, 1., 0.005); //#8, similar to #3, but slower
+
+	gann::score_scaler_none                    scaler;
 
 	std::vector<double> best_params;
 	double best_score;

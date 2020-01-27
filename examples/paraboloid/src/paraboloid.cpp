@@ -59,10 +59,10 @@ int main()
 
 	std::fstream stats_file(STATS_FILENAME, std::ios::out);
 
-	gann::selection_op_roulette            selection(10);
-	gann::crossover_op_multiple_arithmetic crossover;
-	gann::mutation_op_single_normal        mutation(0.2);
-	gann::score_scaler_linear_nz           scaler;
+	gann::selection_op_roulette       selection(10);
+	gann::crossover_op_arithmetic_all crossover;
+	gann::mutation_op_normal_single   mutation(0.2);
+	gann::score_scaler_linear_nz      scaler;
 
 	std::vector<double> best_params;
 	double best_score;

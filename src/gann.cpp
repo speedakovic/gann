@@ -109,55 +109,110 @@ void selection_op_tournament::operator()(const std::vector<double> &scores, std:
 // crossover operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void crossover_op_single_arithmetic::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void crossover_op_arithmetic_single::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<size_t> distr_index(0, limits.size() - 1);
+	std::uniform_int_distribution<size_t> distr_param_index(0, limits.size() - 1);
 	std::uniform_real_distribution<double> distr_alpha(0, 1);
 
-	for (size_t i = 0; i < population.size() - 1; i += 2) {
+	for (size_t pop_index = 0; pop_index < population.size() - 1; pop_index += 2) {
 
-		std::vector<double> &ind1 = population[i];
-		std::vector<double> &ind2 = population[i + 1];
+		std::vector<double> &ind1 = population[pop_index];
+		std::vector<double> &ind2 = population[pop_index + 1];
 
-		size_t index = distr_index(mt);
+		size_t param_index = distr_param_index(mt);
 		double alpha = distr_alpha(mt);
 
-		double ind1_par = ind1[index];
-		double ind2_par = ind2[index];
+		double ind1_par = ind1[param_index];
+		double ind2_par = ind2[param_index];
 
-		ind1[index] = ind1_par * alpha	+ ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
-		ind2[index] = ind2_par * alpha	+ ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+		ind1[param_index] = ind1_par * alpha	+ ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+		ind2[param_index] = ind2_par * alpha	+ ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
 	}
 }
 
-void crossover_op_multiple_arithmetic::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void crossover_op_arithmetic_all::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
-	std::uniform_int_distribution<size_t> distr_index(1, limits.size());
 	std::uniform_real_distribution<double> distr_alpha(0, 1);
 
-	for (size_t i = 0; i < population.size() - 1; i += 2) {
+	for (size_t pop_index = 0; pop_index < population.size() - 1; pop_index += 2) {
 
-		std::vector<double> &ind1 = population[i];
-		std::vector<double> &ind2 = population[i + 1];
+		std::vector<double> &ind1 = population[pop_index];
+		std::vector<double> &ind2 = population[pop_index + 1];
 
-		std::vector<size_t> indexes(limits.size());
-		std::iota(indexes.begin(), indexes.end(), 0);
-		std::shuffle(indexes.begin(), indexes.end(), mt);
-		indexes.resize(distr_index(mt));
-
-		for (const auto &index : indexes) {
+		for (size_t param_index = 0; param_index < limits.size(); ++param_index) {
 
 			double alpha = distr_alpha(mt);
 
-			double ind1_par = ind1[index];
-			double ind2_par = ind2[index];
+			double ind1_par = ind1[param_index];
+			double ind2_par = ind2[param_index];
 
-			ind1[index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
-			ind2[index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+		}
+	}
+}
+
+void crossover_op_arithmetic_multiple_fix::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_real_distribution<double> distr_alpha(0, 1);
+
+	size_t sel_params = !n || n > limits.size() ? limits.size() : n;
+
+	for (size_t pop_index = 0; pop_index < population.size() - 1; pop_index += 2) {
+
+		std::vector<double> &ind1 = population[pop_index];
+		std::vector<double> &ind2 = population[pop_index + 1];
+
+		std::vector<size_t> param_indexes(limits.size());
+		std::iota(param_indexes.begin(), param_indexes.end(), 0);
+		std::shuffle(param_indexes.begin(), param_indexes.end(), mt);
+		param_indexes.resize(sel_params);
+
+		for (const auto &param_index : param_indexes) {
+
+			double alpha = distr_alpha(mt);
+
+			double ind1_par = ind1[param_index];
+			double ind2_par = ind2[param_index];
+
+			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+		}
+	}
+}
+
+void crossover_op_arithmetic_multiple_rnd::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<size_t> distr_sel_params(1, !n || n > limits.size() ? limits.size() : n);
+	std::uniform_real_distribution<double> distr_alpha(0, 1);
+
+	for (size_t pop_index = 0; pop_index < population.size() - 1; pop_index += 2) {
+
+		std::vector<double> &ind1 = population[pop_index];
+		std::vector<double> &ind2 = population[pop_index + 1];
+
+		std::vector<size_t> param_indexes(limits.size());
+		std::iota(param_indexes.begin(), param_indexes.end(), 0);
+		std::shuffle(param_indexes.begin(), param_indexes.end(), mt);
+		param_indexes.resize(distr_sel_params(mt));
+
+		for (const auto &param_index : param_indexes) {
+
+			double alpha = distr_alpha(mt);
+
+			double ind1_par = ind1[param_index];
+			double ind2_par = ind2[param_index];
+
+			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
 		}
 	}
 }
@@ -166,7 +221,7 @@ void crossover_op_multiple_arithmetic::operator()(const std::vector<std::vector<
 // mutation operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void mutation_op_single_uniform::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_uniform_single::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -186,7 +241,7 @@ void mutation_op_single_uniform::operator()(const std::vector<std::vector<double
 	}
 }
 
-void mutation_op_single_normal::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_normal_single::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -212,13 +267,40 @@ void mutation_op_single_normal::operator()(const std::vector<std::vector<double>
 	}
 }
 
-void mutation_op_multiple_normal::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_normal_all::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
 	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
-	std::uniform_int_distribution<size_t> distr_param_index(0, limits.size());
 	std::vector<std::normal_distribution<double>> distr_param;
+
+	for (const auto &limit : limits)
+		distr_param.push_back(std::normal_distribution<double>(0., c * (limit[1] - limit[0])));
+
+	for (auto &ind : population) {
+		size_t pop_index = distr_pop_index(mt);
+		if (pop_index < population.size()) {
+			for (size_t param_index = 0; param_index < limits.size(); ++param_index) {
+				ind[param_index] += distr_param[param_index](mt);
+				if (!static_cast<int>(limits[param_index][2])) {
+					if (ind[param_index] < limits[param_index][0])
+						ind[param_index] = limits[param_index][0];
+					else if (ind[param_index] > limits[param_index][1])
+						ind[param_index] = limits[param_index][1];
+				}
+			}
+		}
+	}
+}
+
+void mutation_op_normal_multiple_fix::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
+	std::vector<std::normal_distribution<double>> distr_param;
+
+	size_t sel_params = !n || n > limits.size() ? limits.size() : n;
 
 	for (const auto &limit : limits)
 		distr_param.push_back(std::normal_distribution<double>(0., c * (limit[1] - limit[0])));
@@ -229,7 +311,7 @@ void mutation_op_multiple_normal::operator()(const std::vector<std::vector<doubl
 			std::vector<size_t> param_indexes(limits.size());
 			std::iota(param_indexes.begin(), param_indexes.end(), 0);
 			std::shuffle(param_indexes.begin(), param_indexes.end(), mt);
-			param_indexes.resize(distr_param_index(mt));
+			param_indexes.resize(sel_params);
 			for (const auto &param_index : param_indexes) {
 				ind[param_index] += distr_param[param_index](mt);
 				if (!static_cast<int>(limits[param_index][2])) {
@@ -243,7 +325,38 @@ void mutation_op_multiple_normal::operator()(const std::vector<std::vector<doubl
 	}
 }
 
-void mutation_op_multiple_normal_2::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+void mutation_op_normal_multiple_rnd::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
+{
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<size_t> distr_pop_index(0, population.size() / p - 1);
+	std::uniform_int_distribution<size_t> distr_sel_params(1, !n || n > limits.size() ? limits.size() : n);
+	std::vector<std::normal_distribution<double>> distr_param;
+
+	for (const auto &limit : limits)
+		distr_param.push_back(std::normal_distribution<double>(0., c * (limit[1] - limit[0])));
+
+	for (auto &ind : population) {
+		size_t pop_index = distr_pop_index(mt);
+		if (pop_index < population.size()) {
+			std::vector<size_t> param_indexes(limits.size());
+			std::iota(param_indexes.begin(), param_indexes.end(), 0);
+			std::shuffle(param_indexes.begin(), param_indexes.end(), mt);
+			param_indexes.resize(distr_sel_params(mt));
+			for (const auto &param_index : param_indexes) {
+				ind[param_index] += distr_param[param_index](mt);
+				if (!static_cast<int>(limits[param_index][2])) {
+					if (ind[param_index] < limits[param_index][0])
+						ind[param_index] = limits[param_index][0];
+					else if (ind[param_index] > limits[param_index][1])
+						ind[param_index] = limits[param_index][1];
+				}
+			}
+		}
+	}
+}
+
+void mutation_op_normal_multiple_rnd2::operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());

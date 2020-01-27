@@ -263,35 +263,81 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
 };
 
-/// @brief Single arithmetic crossover operator.
+/// @brief Arithmetic single-parameter crossover operator.
 ///
-///        Each two neighbouring individuals are crossovered into new two ones.
-///        Single parameter index 'i' is randomly selected.
-///        Random value 'alpha' is selected from uniform distribution U(0,1).
+///        Each two neighbouring individuals are selected to crossover into new two ones.
+///        Then single parameter index 'i' is randomly selected.
+///        Then random value 'alpha' is selected from uniform distribution U(0,1).
 ///        Then crossover is performed in this way:
 ///        child1 = parent1
 ///        child1[i] = parent1[i] * alpha + parent2[i] * (1 - alpha)
 ///        child2 = parent2
 ///        child2[i] = parent2[i] * alpha + parent1[i] * (1 - alpha)
-class crossover_op_single_arithmetic : public crossover_op
+class crossover_op_arithmetic_single : public crossover_op
 {
 public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
-/// @brief Multiple arithmetic crossover operator.
+/// @brief Arithmetic all-parameters crossover operator.
 ///
-///        Each two neighbouring individuals are crossovered into new two ones.
-///        Multiple parameter indexes 'i' are randomly selected.
-///        For each 'i' random value 'alpha' is selected from uniform distribution U(0,1).
+///        Each two neighbouring individuals are selected to crossover into new two ones.
+///        Then all parameter indexes 'i' are selected.
+///        Then for each 'i' random value 'alpha' is selected from uniform distribution U(0,1).
 ///        Then crossover is performed in this way:
 ///        child1 = parent1
 ///        child1[i] = parent1[i] * alpha + parent2[i] * (1 - alpha)
 ///        child2 = parent2
 ///        child2[i] = parent2[i] * alpha + parent1[i] * (1 - alpha)
-class crossover_op_multiple_arithmetic : public crossover_op
+class crossover_op_arithmetic_all : public crossover_op
 {
 public:
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+};
+
+/// @brief Arithmetic multiple-parameter crossover operator, fixed number of crossovered parameters.
+///
+///        Each two neighbouring individuals are selected to crossover into new two ones.
+///        Then 'n' number of parameter indexes 'i' are randomly selected.
+///        Then for each 'i' random value 'alpha' is selected from uniform distribution U(0,1).
+///        Then crossover is performed in this way:
+///        child1 = parent1
+///        child1[i] = parent1[i] * alpha + parent2[i] * (1 - alpha)
+///        child2 = parent2
+///        child2[i] = parent2[i] * alpha + parent1[i] * (1 - alpha)
+class crossover_op_arithmetic_multiple_fix : public crossover_op
+{
+private:
+	const size_t n;
+public:
+	/// @brief Constructor.
+	/// @param n number of randomly selected parameters to be crossovered,
+	///          zero will be replaced by number of all parameters
+	explicit crossover_op_arithmetic_multiple_fix(size_t n = 0) : n(n) {}
+
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+};
+
+/// @brief Arithmetic multiple-parameter crossover operator, random number of crossovered parameters.
+///
+///        Each two neighbouring individuals are selected to crossover into new two ones.
+///        Then number (choosen from uniform distribution U(1, n)) of parameter indexes 'i' are randomly selected.
+///        Then for each 'i' random value 'alpha' is selected from uniform distribution U(0,1).
+///        Then crossover is performed in this way:
+///        child1 = parent1
+///        child1[i] = parent1[i] * alpha + parent2[i] * (1 - alpha)
+///        child2 = parent2
+///        child2[i] = parent2[i] * alpha + parent1[i] * (1 - alpha)
+class crossover_op_arithmetic_multiple_rnd : public crossover_op
+{
+private:
+	const size_t n;
+public:
+	/// @brief Constructor.
+	/// @param n determines number (choosen from uniform distribution U(1, n)) of randomly selected parameters to be crossovered,
+	///          zero will be replaced by number of all parameters
+	explicit crossover_op_arithmetic_multiple_rnd(size_t n = 0) : n(n) {}
+
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
@@ -315,29 +361,29 @@ public:
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
 };
 
-/// @brief Single uniform mutation operator.
+/// @brief Uniform single-parameter mutation operator.
 ///
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then single random parameter is selected and mutated by replacing with value
 ///        from uniform distribution U(limit[i][0], limit[i][1])
-class mutation_op_single_uniform : public mutation_op
+class mutation_op_uniform_single : public mutation_op
 {
 private:
 	const double p;
 public:
 	/// @brief Constructor.
 	/// @param p probability of mutation of one individual
-	explicit mutation_op_single_uniform(double p = 0.01) : p(p) {}
+	explicit mutation_op_uniform_single(double p = 0.01) : p(p) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
-/// @brief Single normal mutation operator.
+/// @brief Normal single-parameter mutation operator.
 ///
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then single random parameter is selected and mutated by adding value
 ///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
-class mutation_op_single_normal : public mutation_op
+class mutation_op_normal_single : public mutation_op
 {
 private:
 	const double p;
@@ -347,17 +393,17 @@ public:
 	/// @param p probability of mutation of each individual
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
-	explicit mutation_op_single_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
+	explicit mutation_op_normal_single(double p = 0.01, double c = 0.25) : p(p), c(c) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
-/// @brief Multiple normal mutation operator.
+/// @brief Normal all-parameters mutation operator.
 ///
 ///        Each individual is selected for mutation with probability 'p'.
-///        Then multiple random parameters are selected and mutated by adding values
+///        Then all parameters are mutated by adding values
 ///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
-class mutation_op_multiple_normal : public mutation_op
+class mutation_op_normal_all : public mutation_op
 {
 private:
 	const double p;
@@ -367,17 +413,64 @@ public:
 	/// @param p probability of mutation of each individual
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
-	explicit mutation_op_multiple_normal(double p = 0.01, double c = 0.25) : p(p), c(c) {}
+	explicit mutation_op_normal_all(double p = 0.01, double c = 0.25) : p(p), c(c) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
 
-/// @brief Multiple normal mutation operator, 2th version.
+/// @brief Normal multiple-parameters mutation operator, fixed number of mutated parameters.
+///
+///        Each individual is selected for mutation with probability 'p'.
+///        Then 'n' parameters are randomly selected and mutated by adding values
+///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
+class mutation_op_normal_multiple_fix : public mutation_op
+{
+private:
+	const double p;
+	const size_t n;
+	const double c;
+public:
+	/// @brief Constructor.
+	/// @param p probability of mutation of each individual
+	/// @param n number of randomly selected parameters to be mutated,
+	///          zero will be replaced by number of all parameters
+	/// @param c constant used to derive standard deviation parameter of normal distribution
+	///          stddev = c * (limit[i][1] - limit[i][0])
+	explicit mutation_op_normal_multiple_fix(double p = 0.01, size_t n = 0, double c = 0.25) : p(p), n(n), c(c) {}
+
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+};
+
+/// @brief Normal multiple-parameters mutation operator, random number of mutated parameters.
+///
+///        Each individual is selected for mutation with probability 'p'.
+///        Then number (choosen from uniform distribution U(1, n)) of parameters
+///        are randomly selected and mutated by adding values.
+///        from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
+class mutation_op_normal_multiple_rnd : public mutation_op
+{
+private:
+	const double p;
+	const size_t n;
+	const double c;
+public:
+	/// @brief Constructor.
+	/// @param p probability of mutation of each individual
+	/// @param n determines number (choosen from U(1,n)) of randomly selected parameters to be mutated,
+	///          zero will be replaced by number of all parameters
+	/// @param c constant used to derive standard deviation parameter of normal distribution
+	///          stddev = c * (limit[i][1] - limit[i][0])
+	explicit mutation_op_normal_multiple_rnd(double p = 0.01, size_t n = 0, double c = 0.25) : p(p), n(n), c(c) {}
+
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
+};
+
+/// @brief Normal multiple-parameters mutation operator, random number of mutated parameters.
 ///
 ///        Each individual is selected for mutation with probability 'p'.
 ///        Then each parameter is selected with probability 'q' and mutated
 ///        by adding value from normal distribution N(0, c * (limit[i][1] - limit[i][0]))
-class mutation_op_multiple_normal_2 : public mutation_op
+class mutation_op_normal_multiple_rnd2 : public mutation_op
 {
 private:
 	const double p;
@@ -389,7 +482,7 @@ public:
 	/// @param q probability of mutation of each parameter
 	/// @param c constant used to derive standard deviation parameter of normal distribution
 	///          stddev = c * (limit[i][1] - limit[i][0])
-	explicit mutation_op_multiple_normal_2(double p = 0.01, double q = 0.01, double c = 0.25) : p(p), q(q), c(c) {}
+	explicit mutation_op_normal_multiple_rnd2(double p = 0.01, double q = 0.01, double c = 0.25) : p(p), q(q), c(c) {}
 
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override;
 };
