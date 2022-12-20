@@ -179,7 +179,7 @@ void checknotless(const T &x, const T &y, const std::string &msg = "less number"
 }
 
 template <typename T>
-bool checkparamsetswithinlimits(const std::vector<std::vector<T>> &limits,
+void checkparamsetswithinlimits(const std::vector<std::vector<T>> &limits,
                                 const std::vector<std::vector<T>> &paramsets,
                                 const std::string &msg = "paramsets not within limits")
 {
