@@ -548,7 +548,7 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 
 		calculate_stats(scores, i_scores, mean_score, median_score);
 		calculate_convergence(conv, best_scores, scores[i_scores.front()]);
-		
+
 		//GANN_DBG("gen: " << gencnt << ", best: " << scores[i_scores.front()] << ", worst: " << scores[i_scores.back()]
 		//                 << ", mean: " << mean_score << ", median: " << median_score << ", conv: " << conv << std::endl);
 
