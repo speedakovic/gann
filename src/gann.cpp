@@ -127,8 +127,20 @@ void crossover_op_arithmetic_single::operator()(const std::vector<std::vector<do
 		double ind1_par = ind1[param_index];
 		double ind2_par = ind2[param_index];
 
-		ind1[param_index] = ind1_par * alpha	+ ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
-		ind2[param_index] = ind2_par * alpha	+ ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+		ind1[param_index] = ind1_par * alpha + ind2_par * (1. - alpha);
+		ind2[param_index] = ind2_par * alpha + ind1_par * (1. - alpha);
+
+		if (!static_cast<int>(limits[param_index][2])) {
+			if (ind1[param_index] < limits[param_index][0])
+				ind1[param_index] = limits[param_index][0];
+			else if (ind1[param_index] > limits[param_index][1])
+				ind1[param_index] = limits[param_index][1];
+
+			if (ind2[param_index] < limits[param_index][0])
+				ind2[param_index] = limits[param_index][0];
+			else if (ind2[param_index] > limits[param_index][1])
+				ind2[param_index] = limits[param_index][1];
+		}
 	}
 }
 
@@ -150,8 +162,20 @@ void crossover_op_arithmetic_all::operator()(const std::vector<std::vector<doubl
 			double ind1_par = ind1[param_index];
 			double ind2_par = ind2[param_index];
 
-			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
-			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - alpha);
+			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - alpha);
+
+			if (!static_cast<int>(limits[param_index][2])) {
+				if (ind1[param_index] < limits[param_index][0])
+					ind1[param_index] = limits[param_index][0];
+				else if (ind1[param_index] > limits[param_index][1])
+					ind1[param_index] = limits[param_index][1];
+
+				if (ind2[param_index] < limits[param_index][0])
+					ind2[param_index] = limits[param_index][0];
+				else if (ind2[param_index] > limits[param_index][1])
+					ind2[param_index] = limits[param_index][1];
+			}
 		}
 	}
 }
@@ -181,8 +205,20 @@ void crossover_op_arithmetic_multiple_fix::operator()(const std::vector<std::vec
 			double ind1_par = ind1[param_index];
 			double ind2_par = ind2[param_index];
 
-			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
-			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - alpha);
+			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - alpha);
+
+			if (!static_cast<int>(limits[param_index][2])) {
+				if (ind1[param_index] < limits[param_index][0])
+					ind1[param_index] = limits[param_index][0];
+				else if (ind1[param_index] > limits[param_index][1])
+					ind1[param_index] = limits[param_index][1];
+
+				if (ind2[param_index] < limits[param_index][0])
+					ind2[param_index] = limits[param_index][0];
+				else if (ind2[param_index] > limits[param_index][1])
+					ind2[param_index] = limits[param_index][1];
+			}
 		}
 	}
 }
@@ -211,8 +247,20 @@ void crossover_op_arithmetic_multiple_rnd::operator()(const std::vector<std::vec
 			double ind1_par = ind1[param_index];
 			double ind2_par = ind2[param_index];
 
-			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
-			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - std::numeric_limits<double>::epsilon() - alpha);
+			ind1[param_index] = ind1_par * alpha + ind2_par * (1. - alpha);
+			ind2[param_index] = ind2_par * alpha + ind1_par * (1. - alpha);
+
+			if (!static_cast<int>(limits[param_index][2])) {
+				if (ind1[param_index] < limits[param_index][0])
+					ind1[param_index] = limits[param_index][0];
+				else if (ind1[param_index] > limits[param_index][1])
+					ind1[param_index] = limits[param_index][1];
+
+				if (ind2[param_index] < limits[param_index][0])
+					ind2[param_index] = limits[param_index][0];
+				else if (ind2[param_index] > limits[param_index][1])
+					ind2[param_index] = limits[param_index][1];
+			}
 		}
 	}
 }
