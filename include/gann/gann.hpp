@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
 template<typename T>
 double nz(const T &x)
 {
-	return x == 0.0 ? std::numeric_limits<T>::epsilon() : x;
+	return x == 0.0 ? std::numeric_limits<T>::min() : x;
 }
 
 template<typename T>
@@ -52,7 +52,7 @@ double clamp_nz(const T &x)
 	else if (x == -std::numeric_limits<T>::infinity())
 		return std::numeric_limits<T>::lowest();
 	else if (x == 0.0)
-		return std::numeric_limits<T>::epsilon();
+		return std::numeric_limits<T>::min();
 	else
 		return x;
 }
