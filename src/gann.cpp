@@ -443,32 +443,60 @@ void score_scaler_none::operator()(const std::vector<double> &scores, std::vecto
 
 void score_scaler_offset::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
-	double tmp = *std::min_element(scores.begin(), scores.end());
-	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
+	double min = *std::min_element(scores.begin(), scores.end());
+	double max = *std::max_element(scores.begin(), scores.end());
+
+	if (max - min == std::numeric_limits<double>::infinity())
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return 0.5 * score - 0.5 * min;});
+	else
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return score - min;});
 }
 
 void score_scaler_offset_nz::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
-	double tmp = *std::min_element(scores.begin(), scores.end()) - std::numeric_limits<double>::epsilon();;
-	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
+	double min = *std::min_element(scores.begin(), scores.end());
+	double max = *std::max_element(scores.begin(), scores.end());
+
+	if (max - min == std::numeric_limits<double>::infinity())
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return 0.5 * score - 0.5 * min;});
+	else
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return score - min;});
+
+	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [](const double &score){return score == 0.0 ? std::numeric_limits<double>::min() : score;});
 }
 
 void score_scaler_linear::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
-	double tmp = *std::min_element(scores.begin(), scores.end());
-	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
+	double min = *std::min_element(scores.begin(), scores.end());
+	double max = *std::max_element(scores.begin(), scores.end());
 
-	tmp = *std::max_element(scores_scaled.begin(), scores_scaled.end());
-	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&tmp](const double &score){return score / tmp;});
+	if (max - min == std::numeric_limits<double>::infinity())
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return 0.5 * score - 0.5 * min;});
+	else
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return score - min;});
+
+	max = *std::max_element(scores_scaled.begin(), scores_scaled.end());
+
+	if (max != 0.0)
+		std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&max](const double &score){return score / max;});
 }
 
 void score_scaler_linear_nz::operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const
 {
-	double tmp = *std::min_element(scores.begin(), scores.end()) - std::numeric_limits<double>::epsilon();
-	std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&tmp](const double &score){return score - tmp;});
+	double min = *std::min_element(scores.begin(), scores.end());
+	double max = *std::max_element(scores.begin(), scores.end());
 
-	tmp = *std::max_element(scores_scaled.begin(), scores_scaled.end());
-	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&tmp](const double &score){return score / tmp;});
+	if (max - min == std::numeric_limits<double>::infinity())
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return 0.5 * score - 0.5 * min;});
+	else
+		std::transform(scores.begin(), scores.end(), scores_scaled.begin(), [&min](const double &score){return score - min;});
+
+	max = *std::max_element(scores_scaled.begin(), scores_scaled.end());
+
+	if (max != 0.0)
+		std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [&max](const double &score){return score / max;});
+
+	std::transform(scores_scaled.begin(), scores_scaled.end(), scores_scaled.begin(), [](const double &score){return score == 0.0 ? std::numeric_limits<double>::min() : score;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
