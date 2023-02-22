@@ -632,18 +632,44 @@ public:
 	///             then it is executed sequentially in caller's thread,
 	///             otherwise it is executed concurrently in multiple separated threads.
 	/// @param stats_listener Called after each generation has been evaluated.
-	/// @param params best genome
+	/// @param params best genome/individual
 	/// @param score best score
-	void operator()(const evaluator_single &eval, const statistics_listener &stats_listener,
-	                std::vector<double> &params, double &score) const;
+	/// @param population population to work with. If empty population is passed, then it will be initialized. Otherwise it is considered
+	///                   as initialized, e.g. as result from previous run.
+	/// @param scores returned scores of population
+	/// @param i_scores returned indexes to scores. Indexes are sorted in way to point to scores/population from highest to lowest value of score.
+	///                 i_score[0] - index of individual (in population vector) with highest score
+	///                            - index of score (in scores vector) with highest value
+	///                 population[i_score[0]] - individual with highest score (= params)
+	///                 scores[i_score[0]] - highest score (= score)
+	void operator()(const evaluator_single &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+	                std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<size_t> &i_scores) const;
+
+	void operator()(const evaluator_single &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+	                std::vector<std::vector<double>> &population) const;
+
+	void operator()(const evaluator_single &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score) const;
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. It is executed sequentially in caller's thread;
 	/// @param stats_listener Called after each generation has been evaluated.
-	/// @param params best genome
+	/// @param params best genome/individual
 	/// @param score best score
-	void operator()(const evaluator_multi &eval, const statistics_listener &stats_listener,
-	                std::vector<double> &params, double &score) const;
+	/// @param population population to work with. If empty population is passed, then it will be initialized. Otherwise it is considered
+	///                   as initialized, e.g. as result from previous run.
+	/// @param scores returned scores of population
+	/// @param i_scores returned indexes to scores. Indexes are sorted in way to point to scores/population from highest to lowest value of score.
+	///                 i_score[0] - index of individual (in population vector) with highest score
+	///                            - index of score (in scores vector) with highest value
+	///                 population[i_score[0]] - individual with highest score (= params)
+	///                 scores[i_score[0]] - highest score (= score)
+	void operator()(const evaluator_multi &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+	                std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<size_t> &i_scores) const;
+
+	void operator()(const evaluator_multi &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+	                std::vector<std::vector<double>> &population) const;
+
+	void operator()(const evaluator_multi &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score) const;
 
 private:
 	void initialize_population(std::vector<std::vector<double>> &population) const;

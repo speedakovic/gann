@@ -523,16 +523,13 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
 {}
 
 // conv = bestscore[current - convn] / bestscore[current]
-void ga_simple::operator()(const evaluator_single &eval, const statistics_listener &stats_listener,
-                           std::vector<double> &params, double &score) const
+void ga_simple::operator()(const evaluator_single &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+                           std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<size_t> &i_scores) const
 {
-	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
 	std::vector<double> scores_scaled(popsize);
-	std::vector<double> scores(popsize);
 	std::queue<double> best_scores;
 
-	std::vector<size_t> i_scores(popsize);
 	double mean_score;
 	double median_score;
 	double conv;
@@ -542,7 +539,13 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 	GANN_DBG("running simple ga with single-evaluator..." << std::endl);
 	GANN_DBG("running threads: " << thnum << std::endl);
 
-	initialize_population(population);
+	if (population.empty()) {
+		population.resize(popsize, std::vector<double>(limits.size()));
+		initialize_population(population);
+	}
+
+	scores.resize(popsize);
+	i_scores.resize(popsize);
 
 	checkfinite(population, "not-finite number in population");
 	checkparamsetswithinlimits(limits, population, "population parameters not within limits");
@@ -638,17 +641,32 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 	score  = scores[i_scores.front()];
 }
 
-// conv = bestscore[current - convn] / bestscore[current]
-void ga_simple::operator()(const evaluator_multi &eval, const statistics_listener &stats_listener,
-                           std::vector<double> &params, double &score) const
+void ga_simple::operator()(const evaluator_single &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+                           std::vector<std::vector<double>> &population) const
 {
-	std::vector<std::vector<double>> population(popsize, std::vector<double>(limits.size()));
+	std::vector<double> scores;
+	std::vector<size_t> i_scores;
+
+	(*this)(eval, stats_listener, params, score, population, scores, i_scores);
+}
+
+void ga_simple::operator()(const evaluator_single &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score) const
+{
+	std::vector<std::vector<double>> population;
+	std::vector<double> scores;
+	std::vector<size_t> i_scores;
+
+	(*this)(eval, stats_listener, params, score, population, scores, i_scores);
+}
+
+// conv = bestscore[current - convn] / bestscore[current]
+void ga_simple::operator()(const evaluator_multi &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+                           std::vector<std::vector<double>> &population, std::vector<double> &scores, std::vector<size_t> &i_scores) const
+{
 	std::vector<std::vector<double>> elite(elisize, std::vector<double>(limits.size()));
 	std::vector<double> scores_scaled(popsize);
-	std::vector<double> scores(popsize);
 	std::queue<double> best_scores;
 
-	std::vector<size_t> i_scores(popsize);
 	double mean_score;
 	double median_score;
 	double conv;
@@ -657,7 +675,13 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 
 	GANN_DBG("running simple ga with multi-evaluator..." << std::endl);
 
-	initialize_population(population);
+	if (population.empty()) {
+		population.resize(popsize, std::vector<double>(limits.size()));
+		initialize_population(population);
+	}
+
+	scores.resize(popsize);
+	i_scores.resize(popsize);
 
 	checkfinite(population, "not-finite number in population");
 	checkparamsetswithinlimits(limits, population, "population parameters not within limits");
@@ -747,6 +771,24 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 
 	params = population[i_scores.front()];
 	score  = scores[i_scores.front()];
+}
+
+void ga_simple::operator()(const evaluator_multi &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score,
+                           std::vector<std::vector<double>> &population) const
+{
+	std::vector<double> scores;
+	std::vector<size_t> i_scores;
+
+	(*this)(eval, stats_listener, params, score, population, scores, i_scores);
+}
+
+void ga_simple::operator()(const evaluator_multi &eval, const statistics_listener &stats_listener, std::vector<double> &params, double &score) const
+{
+	std::vector<std::vector<double>> population;
+	std::vector<double> scores;
+	std::vector<size_t> i_scores;
+
+	(*this)(eval, stats_listener, params, score, population, scores, i_scores);
 }
 
 void ga_simple::initialize_population(std::vector<std::vector<double>> &population) const
