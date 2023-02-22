@@ -6,7 +6,9 @@
 #include <queue>
 #include <vector>
 #include <limits>
+#include <istream>
 #include <ostream>
+#include <sstream>
 #include <exception>
 #include <stdexcept>
 #include <functional>
@@ -16,6 +18,67 @@ namespace gann
 ////////////////////////////////////////////////////////////////////////////////
 // utils
 ////////////////////////////////////////////////////////////////////////////////
+
+namespace serialize
+{
+
+template<typename T>
+std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
+{
+	for (size_t i = 0; i < x.size(); ++i) {
+		out << x[i];
+		if (i < x.size() - 1)
+			out << " ";
+	}
+	return out;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream &in, std::vector<T> &x)
+{
+	x.resize(0);
+	std::string line;
+	if (std::getline(in, line)) {
+		std::stringstream ss{line};
+		T d;
+		while (ss >> d)
+			x.push_back(d);
+	}
+	return in;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream &out, const std::vector<std::vector<T>> &x)
+{
+	for (size_t i = 0; i < x.size(); ++i) {
+		for (size_t j = 0; j < x[i].size(); ++j) {
+			out << x[i][j];
+			if (j < x[i].size() - 1)
+				out << " ";
+		}
+		if (i < x.size() - 1)
+			out << std::endl;
+	}
+	return out;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream &in, std::vector<std::vector<T>> &x)
+{
+	x.resize(0);
+	std::string line;
+	while (std::getline(in, line)) {
+		std::vector<double> y;
+		std::stringstream ss{line};
+		T d;
+		while (ss >> d)
+			y.push_back(d);
+		x.push_back(y);
+	}
+	return in;
+}
+
+} // namespace serialize
 
 template<typename T>
 std::ostream& operator<<(std::ostream &out, const std::vector<T> &x)
