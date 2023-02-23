@@ -21,6 +21,32 @@ namespace gann
 
 void selection_op_roulette::operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
 {
+#if 1
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::discrete_distribution<size_t> distr(scores.begin(), scores.end());
+
+	std::vector<std::vector<double>> population_old(population);
+
+	for (size_t i = 0; i < population.size() - 1; i += 2) {
+
+		size_t extra_run = extra_runs;
+		size_t i0, i1;
+
+		{
+			i0 = distr(mt);
+		}
+
+		do {
+			i1 = distr(mt);
+
+		} while (population_old[i0] == population_old[i1] && extra_run--);
+
+		population[i    ] = population_old[i0];
+		population[i + 1] = population_old[i1];
+	}
+
+#else
 	double s = std::accumulate(scores.begin(), scores.end(), 0.);
 
 	checknormal(s, "not-normal number in roulette selection operator");
@@ -61,6 +87,7 @@ void selection_op_roulette::operator()(const std::vector<double> &scores, std::v
 		population[i    ] = population_old[i0];
 		population[i + 1] = population_old[i1];
 	}
+#endif
 }
 
 void selection_op_tournament::operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
