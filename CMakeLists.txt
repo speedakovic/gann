@@ -33,6 +33,8 @@ configure_file(examples/pointsfit/scripts/pointsfit_stats.gpi pointsfit_stats.gp
 configure_file(examples/pointsfit/scripts/pointsfit_func.gpi pointsfit_func.gpi COPYONLY)
 configure_file(examples/pointsfit/scripts/pointsfit_run.sh pointsfit_run.sh COPYONLY)
 
+add_executable(seltest examples/seltest/src/seltest.cpp)
+
 target_link_libraries(paraboloid ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(pointsfit ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
-
+target_link_libraries(seltest ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
