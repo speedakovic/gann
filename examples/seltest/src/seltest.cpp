@@ -32,7 +32,7 @@ void test(const gann::selection_op &sel, const std::string &name,
 	std::map<int, int> histogram;
 
 	auto begin = std::chrono::steady_clock::now();
-	for (int i = 0; i < runs; ++i) {
+	for (size_t i = 0; i < runs; ++i) {
 		auto pop = population;
 		sel(i_scores, scores, pop);
 		for (const auto & individual : pop)

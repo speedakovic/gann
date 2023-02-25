@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(gann)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-unused-function -Wno-unused-lambda-capture -Wno-unused-private-field -Wno-parentheses")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3")
+
 find_package(Threads)
 
 set(GANN_SRC src/gann.cpp)
