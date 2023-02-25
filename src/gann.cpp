@@ -19,7 +19,7 @@ namespace gann
 // selection operators
 ////////////////////////////////////////////////////////////////////////////////
 
-void selection_op_roulette::operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
+void selection_op_roulette::operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
 {
 #if 1
 	std::random_device rd;
@@ -90,7 +90,38 @@ void selection_op_roulette::operator()(const std::vector<double> &scores, std::v
 #endif
 }
 
-void selection_op_tournament::operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
+void selection_op_rank::operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
+{
+	std::vector<size_t> iscores(scores.size());
+	for (size_t i = 0; i < scores.size(); ++i)
+		iscores[i_scores[i]] = scores.size() - i;
+
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::discrete_distribution<size_t> distr(iscores.begin(), iscores.end());
+
+	std::vector<std::vector<double>> population_old(population);
+
+	for (size_t i = 0; i < population.size() - 1; i += 2) {
+
+		size_t extra_run = extra_runs;
+		size_t i0, i1;
+
+		{
+			i0 = distr(mt);
+		}
+
+		do {
+			i1 = distr(mt);
+
+		} while (population_old[i0] == population_old[i1] && extra_run--);
+
+		population[i    ] = population_old[i0];
+		population[i + 1] = population_old[i1];
+	}
+}
+
+void selection_op_tournament::operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const
 {
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -618,7 +649,7 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
-		selection(scores_scaled, population);
+		selection(i_scores, scores_scaled, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);
@@ -752,7 +783,7 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 		for (size_t i = 0; i < elisize; ++i)
 			elite[i] = population[i_scores[i]];
 
-		selection(scores_scaled, population);
+		selection(i_scores, scores_scaled, population);
 
 		//if (size_t dups = find_2by2_duplicates(population))
 		//	GANN_DBG("2by2 duplicates after selection: " << dups << std::endl);

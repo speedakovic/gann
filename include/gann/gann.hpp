@@ -267,9 +267,10 @@ public:
 	virtual ~selection_op() = default;
 
 	/// @brief Runs operator.
+	/// @param i_scores sorted score indexes
 	/// @param scores population scores
 	/// @param population population genomes
-	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const = 0;
+	virtual void operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const = 0;
 };
 
 /// @brief Roulette selection operator.
@@ -285,7 +286,21 @@ public:
 	///        second parent to be different from the first one.
 	explicit selection_op_roulette(size_t extra_runs = 1) : extra_runs(extra_runs) {}
 
-	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
+};
+
+/// @brief Rank selection operator.
+class selection_op_rank : public selection_op
+{
+private:
+	const size_t extra_runs;
+public:
+	/// @brief Constructor.
+	/// @param extra_runs number of extra rank runs for the each
+	///        second parent to be different from the first one.
+	explicit selection_op_rank(size_t extra_runs = 1) : extra_runs(extra_runs) {}
+
+	virtual void operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
 
 /// @brief Tournament selection operator.
@@ -301,7 +316,7 @@ public:
 	///        second parent to be different from the first one.
 	explicit selection_op_tournament(size_t competitors_num = 2, size_t extra_runs = 1) : competitors_num(competitors_num), extra_runs(extra_runs) {}
 
-	virtual void operator()(const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
+	virtual void operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
