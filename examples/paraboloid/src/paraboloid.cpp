@@ -59,10 +59,40 @@ int main()
 
 	std::fstream stats_file(STATS_FILENAME, std::ios::out);
 
+#if 1
 	gann::selection_op_roulette       selection(10);
 	gann::crossover_op_arithmetic_all crossover;
 	gann::mutation_op_normal_single   mutation(0.2);
 	gann::score_scaler_linear_nz      scaler;
+
+#else
+	gann::selection_op_custom selection(
+		[](const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population){
+			gann::selection_op_roulette(10)(i_scores, scores, population);
+			//gann::selection_op_rank(10)(i_scores, scores, population);
+			//gann::selection_op_tournament(2, 10)(i_scores, scores, population);
+		}
+	);
+
+	gann::crossover_op_custom crossover(
+		[](const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population){
+			gann::crossover_op_arithmetic_all()(limits, population);
+		}
+	);
+
+	gann::mutation_op_custom mutation(
+		[](const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population){
+			gann::mutation_op_normal_single(0.2)(limits, population);
+		}
+	);
+
+	gann::score_scaler_custom scaler(
+		[](const std::vector<double> &scores, std::vector<double> &scores_scaled){
+			gann::score_scaler_linear_nz()(scores, scores_scaled);
+			//gann::score_scaler_none()(scores, scores_scaled);
+		}
+	);
+#endif
 
 	std::vector<double> best_params;
 	double best_score;

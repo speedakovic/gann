@@ -273,6 +273,24 @@ public:
 	virtual void operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const = 0;
 };
 
+/// @brief Custom selection operator.
+class selection_op_custom : public selection_op
+{
+public:
+	typedef std::function<void(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population)> func_type;
+private:
+	const func_type func;
+public:
+	/// @brief Constructor.
+	/// @param func operator function
+	explicit selection_op_custom(const func_type &func) : func(func) {}
+
+	virtual void operator()(const std::vector<size_t> &i_scores, const std::vector<double> &scores, std::vector<std::vector<double>> &population) const override
+	{
+		func(i_scores, scores, population);
+	}
+};
+
 /// @brief Roulette selection operator.
 ///
 ///        The given scores must be positive, so appropriate scaler should be used.
@@ -339,6 +357,24 @@ public:
 	/// @param limits genome limits
 	/// @param population population genomes
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
+};
+
+/// @brief Custom crossover operator.
+class crossover_op_custom : public crossover_op
+{
+public:
+	typedef std::function<void(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population)> func_type;
+private:
+	const func_type func;
+public:
+	/// @brief Constructor.
+	/// @param func operator function
+	explicit crossover_op_custom(const func_type &func) : func(func) {}
+
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override
+	{
+		func(limits, population);
+	};
 };
 
 /// @brief Arithmetic single-parameter crossover operator.
@@ -437,6 +473,24 @@ public:
 	/// @param limits genome limits
 	/// @param population population genomes
 	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const = 0;
+};
+
+/// @brief Custom mutation operator.
+class mutation_op_custom : public mutation_op
+{
+public:
+	typedef std::function<void(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population)> func_type;
+private:
+	const func_type func;
+public:
+	/// @brief Constructor.
+	/// @param func operator function
+	explicit mutation_op_custom(const func_type &func) : func(func) {}
+
+	virtual void operator()(const std::vector<std::vector<double>> &limits, std::vector<std::vector<double>> &population) const override
+	{
+		func(limits, population);
+	}
 };
 
 /// @brief Uniform single-parameter mutation operator.
@@ -580,6 +634,24 @@ public:
 	/// @param scores population scores
 	/// @param scores_scaled scaled population scores
 	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const = 0;
+};
+
+/// @brief Custom scaler.
+class score_scaler_custom : public score_scaler
+{
+public:
+	typedef std::function<void(const std::vector<double> &scores, std::vector<double> &scores_scaled)> func_type;
+private:
+	const func_type func;
+public:
+	/// @brief Constructor.
+	/// @param func scaler function
+	explicit score_scaler_custom(const func_type &func) : func(func) {}
+
+	virtual void operator()(const std::vector<double> &scores, std::vector<double> &scores_scaled) const override
+	{
+		func(scores, scores_scaled);
+	}
 };
 
 /// @brief None scaler.
