@@ -23,6 +23,7 @@ static const size_t GENMAX   = 10000;
 static const size_t CONVN    = 1000;
 static const double CONVNMAX = .99;
 static const double SCOREMAX = 10000.;//std::nan("");
+static const char*  STOPFILE = "";
 
 static const char* STATS_FILENAME = "pointsfit_stats.txt";
 static const char* FUNC_FILENAME = "pointsfit_func.txt";
@@ -144,7 +145,7 @@ int main()
 	double best_score;
 
 	gann::ga_simple ga(ga_limits(MLP_ARCH, SINGLE_LIMITS), selection, crossover, mutation, scaler,
-	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0);
+	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, STOPFILE, 0);
 
 	auto begin = std::chrono::steady_clock::now();
 	ga(evaluator_multi, std::bind(statistics_listener, std::ref(stats_file), _1), best_params, best_score);

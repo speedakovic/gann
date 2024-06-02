@@ -565,7 +565,7 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
                      const selection_op &selection, const crossover_op &crossover, const mutation_op &mutation, const score_scaler &scaler,
                      const size_t &popsize, const size_t &elisize,
                      const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
-                     const size_t &thnum) :
+                     const std::filesystem::path &stopfile, const size_t &thnum) :
 	limits(limits),
 	selection(selection),
 	crossover(crossover),
@@ -577,6 +577,7 @@ ga_simple::ga_simple(const std::vector<std::vector<double>> &limits,
 	convn(convn),
 	convmax(convmax),
 	scoremax(scoremax),
+	stopfile(stopfile),
 	thnum(thnum > 0 ? thnum : std::thread::hardware_concurrency())
 {}
 
@@ -643,6 +644,11 @@ void ga_simple::operator()(const evaluator_single &eval, const statistics_listen
 
 		if (!std::isnan(scoremax) && scores[i_scores.front()] >= scoremax) {
 			GANN_DBG("maximum score reached" << std::endl);
+			break;
+		}
+
+		if (std::filesystem::exists(stopfile)) {
+			GANN_DBG("stop file found" << std::endl);
 			break;
 		}
 
@@ -777,6 +783,11 @@ void ga_simple::operator()(const evaluator_multi &eval, const statistics_listene
 
 		if (!std::isnan(scoremax) && scores[i_scores.front()] >= scoremax) {
 			GANN_DBG("maximum score reached" << std::endl);
+			break;
+		}
+
+		if (std::filesystem::exists(stopfile)) {
+			GANN_DBG("stop file found" << std::endl);
 			break;
 		}
 

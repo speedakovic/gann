@@ -12,6 +12,7 @@
 #include <exception>
 #include <stdexcept>
 #include <functional>
+#include <filesystem>
 
 namespace gann
 {
@@ -745,6 +746,7 @@ private:
 	const size_t convn;
 	const double convmax;
 	const double scoremax;
+	const std::filesystem::path stopfile;
 
 	const size_t thnum;
 
@@ -768,6 +770,8 @@ public:
 	/// @param convmax maximum convergence, running will be terminated when this value is reached
 	/// @param scoremax maximum score, running will be terminated when this value is reached
 	///                 Set to nan to disable termination based on score.
+	/// @param stopfile stop file, running will be terminated when this file is found.
+	///                 Set to empty path to disable termination based on stop file.
 	/// @param thnum number of running threads, if zero then the number will be determined automatically.
 	///              This parameter is meaningful only for running with single individual evaluator.
 	///              Multiple individuals evaluator runs only in one (caller's) thread.
@@ -775,7 +779,7 @@ public:
 	          const selection_op &selection, const crossover_op &crossover, const mutation_op &mutation, const score_scaler &scaler,
 	          const size_t &popsize, const size_t &elisize,
 	          const size_t &genmax, const size_t &convn, const double &convmax, const double &scoremax,
-	          const size_t &thnum);
+	          const std::filesystem::path &stopfile, const size_t &thnum);
 
 	/// @brief Runs genetic algorithm.
 	/// @param eval evaluator. If thnum or number of automatically detected threads equals one,

@@ -18,6 +18,7 @@ static const size_t GENMAX   = 500;
 static const size_t CONVN    = 50;
 static const double CONVNMAX = .99;
 static const double SCOREMAX = std::nan("");
+static const char*  STOPFILE = "";
 
 static const char* STATS_FILENAME = "paraboloid_stats.txt";
 
@@ -98,7 +99,7 @@ int main()
 	double best_score;
 
 	gann::ga_simple ga({{-10, 10, 0}, {-10, 10, 0}}, selection, crossover, mutation, scaler,
-	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, 0);
+	                   POPSIZE, ELISIZE, GENMAX, CONVN, CONVNMAX, SCOREMAX, STOPFILE, 0);
 
 	auto begin = std::chrono::steady_clock::now();
 	ga(evaluator_multi, std::bind(statistics_listener, std::ref(stats_file), _1), best_params, best_score);
